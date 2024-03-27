@@ -8,7 +8,8 @@ import {
   Delete,
   NotFoundException,
   ParseIntPipe,
-  HttpCode,
+  Query,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -26,8 +27,15 @@ export class NotesController {
   }
 
   @Get()
-  findAll(): Promise<Note[]> {
-    return this.notesService.findAll();
+  findAll(
+    @Query(
+      'categories',
+      new ParseArrayPipe({ items: Number, separator: ',', optional: true }),
+    )
+    categories: number[],
+  ): Promise<Note[] | { active: Note[]; archived: Note[] }> {
+    if (!categories) return this.notesService.findAll();
+    return this.notesService.findByCategories(categories);
   }
 
   @Get('/archive')
@@ -49,8 +57,8 @@ export class NotesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateNoteDto: UpdateNoteDto,
   ) {
-    const result = await this.notesService.update(id, updateNoteDto);
-    if (!result.affected) throw new NotFoundException(NOTE_NOT_FOUND_ERROR);
+    const note = await this.notesService.update(id, updateNoteDto);
+    if (!note) throw new NotFoundException(NOTE_NOT_FOUND_ERROR);
     return this.notesService.findOne(id);
   }
 
