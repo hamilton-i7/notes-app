@@ -3,6 +3,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import Providers from './providers';
 import theme from './lib/theme';
+import NotesDrawer from './components/NotesDrawer';
 
 export const metadata: Metadata = {
   title: 'Notes App',
@@ -21,7 +22,7 @@ export default function RootLayout({
           <AppRouterCacheProvider>
             <ThemeProvider theme={theme}>
               <CssBaseline />
-              {children}
+              <NotesDrawer>{children}</NotesDrawer>
             </ThemeProvider>
           </AppRouterCacheProvider>
         </Providers>

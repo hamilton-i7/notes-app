@@ -6,10 +6,12 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 declare module '@mui/material/styles' {
   interface Palette {
     tertiary: Palette['primary'];
+    outline: Palette['divider'];
   }
 
   interface PaletteOptions {
     tertiary?: PaletteOptions['primary'];
+    outline?: PaletteOptions['divider'];
   }
 }
 
@@ -109,6 +111,7 @@ const theme = createTheme({
       surfaceVariant: '#f3dfd1',
       onSurfaceVariant: '#51443b',
     },
+    outline: '#847469',
   },
   typography: {
     fontFamily: plus_jakarta_sans.style.fontFamily,
