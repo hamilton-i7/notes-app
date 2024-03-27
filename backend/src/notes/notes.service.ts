@@ -34,14 +34,11 @@ export class NotesService {
     return this.notesRepository.findOne({ where: { id } });
   }
 
-  async update(
-    id: number,
-    updateNoteDto: UpdateNoteDto,
-  ): Promise<UpdateResult> {
+  update(id: number, updateNoteDto: UpdateNoteDto): Promise<UpdateResult> {
     return this.notesRepository.update(id, updateNoteDto);
   }
 
-  async remove(id: number): Promise<DeleteResult> {
+  remove(id: number): Promise<DeleteResult> {
     return this.notesRepository.delete(id);
   }
 }
