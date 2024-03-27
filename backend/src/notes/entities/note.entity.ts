@@ -30,7 +30,9 @@ export class Note {
   @Column({ type: 'timestamp', nullable: true, default: null })
   archivedAt: Date | null;
 
-  @ManyToMany(() => Category)
+  @ManyToMany((type) => Category, (category) => category.notes, {
+    cascade: true,
+  })
   @JoinTable()
   categories: Category[];
 }
