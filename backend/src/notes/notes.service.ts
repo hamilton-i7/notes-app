@@ -3,7 +3,7 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from './entities/note.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, IsNull, Not, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class NotesService {
@@ -11,23 +11,37 @@ export class NotesService {
     @InjectRepository(Note) private notesRepository: Repository<Note>,
   ) {}
 
-  create(createNoteDto: CreateNoteDto) {
-    return 'This action adds a new note';
+  create(createNoteDto: CreateNoteDto): Promise<Note> {
+    const { content } = createNoteDto;
+    return this.notesRepository.save({
+      ...createNoteDto,
+      content: content ?? '',
+    });
   }
 
   findAll(): Promise<Note[]> {
-    return this.notesRepository.find();
+    return this.notesRepository.find({
+      where: { archivedAt: IsNull() },
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} note`;
+  findArchived(): Promise<Note[]> {
+    return this.notesRepository.find({ where: { archivedAt: Not(IsNull()) } });
   }
 
-  update(id: number, updateNoteDto: UpdateNoteDto) {
-    return `This action updates a #${id} note`;
+  findOne(id: number): Promise<Note | null> {
+    return this.notesRepository.findOne({ where: { id } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} note`;
+  async update(
+    id: number,
+    updateNoteDto: UpdateNoteDto,
+  ): Promise<UpdateResult> {
+    return this.notesRepository.update(id, updateNoteDto);
+  }
+
+  async remove(id: number): Promise<DeleteResult> {
+    return this.notesRepository.delete(id);
   }
 }
