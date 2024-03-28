@@ -1,9 +1,10 @@
 import {
   IsBoolean,
   IsDefined,
-  IsOptional,
+  IsNumber,
   IsString,
   MaxLength,
+  Min,
 } from 'class-validator';
 import {
   EMPTY_NOTE_ERROR,
@@ -23,7 +24,7 @@ export class CreateNoteDto {
   @OnlyOneEmpty('title', { message: EMPTY_NOTE_ERROR })
   content: string;
 
-  @IsOptional()
-  @IsBoolean()
-  archived?: boolean;
+  @IsNumber({ allowNaN: false, maxDecimalPlaces: 0 }, { each: true })
+  @Min(1, { each: true })
+  categories: number[];
 }
