@@ -14,12 +14,15 @@ import {
   ListItemText,
   Divider,
   Slide,
+  Stack,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import { Close, MoreVert } from '@mui/icons-material';
 import ElevationScrollAppBar from '@/app/components/ElevationScrollAppBar';
 import BackgroundColorScrollToolbar from '@/app/components/BackgroundColorScrollToolbar';
 import NoteContent from './components/NoteContent';
+import NoteMenu from './components/NoteMenu';
+import DeleteNoteDialog from './components/DeleteNoteDialog';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -36,6 +39,11 @@ export default function NotePage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const openOptionsMenu = Boolean(anchorEl);
+
+  const [openDeleteNoteDialog, setOpenDeleteNoteDialog] = useState(false);
+
   const handleTitleChange = (text: string) => {
     setTitle(text);
   };
@@ -48,7 +56,27 @@ export default function NotePage() {
     setCurrentNote(null);
   };
 
-  const handleOptionsClick = () => {};
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseOptionsMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCloseDeleteNoteDialog = () => {
+    setOpenDeleteNoteDialog(false);
+  };
+
+  const handleArchiveToggle = () => {
+    handleCloseOptionsMenu();
+    console.log('TOGGLE ARCHIVE STATE');
+  };
+
+  const handleDeleteClick = () => {
+    handleCloseOptionsMenu();
+    setOpenDeleteNoteDialog(true);
+  };
 
   useEffect(() => {
     if (!currentNote) return;
@@ -59,58 +87,80 @@ export default function NotePage() {
   if (!currentNote) return null;
 
   return (
-    <Dialog
-      fullScreen
-      open={Boolean(currentNote)}
-      onClose={handleClose}
-      TransitionComponent={Transition}
-      sx={{
-        '& .MuiPaper-root': {
-          bgcolor: (theme) => theme.palette.background.surface,
-        },
-      }}
-    >
-      <ElevationScrollAppBar>
-        <AppBar
-          sx={{
-            position: 'relative',
-            color: (theme) => theme.palette.background.onSurface,
-          }}
-        >
-          <BackgroundColorScrollToolbar
-            sx={{ justifyContent: 'space-between' }}
+    <>
+      <Dialog
+        fullScreen
+        open={Boolean(currentNote)}
+        onClose={handleClose}
+        TransitionComponent={Transition}
+        sx={{
+          '& .MuiPaper-root': {
+            bgcolor: (theme) => theme.palette.background.surface,
+          },
+        }}
+      >
+        <ElevationScrollAppBar>
+          <AppBar
+            sx={{
+              position: 'relative',
+              color: (theme) => theme.palette.background.onSurface,
+            }}
           >
-            <Toolbar>
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={handleClose}
-                aria-label="close"
-                sx={{ mx: (theme) => theme.spacing(2) }}
-              >
-                <Close />
-              </IconButton>
-              <IconButton
-                edge="end"
-                color="inherit"
-                onClick={handleOptionsClick}
-                aria-label="close"
-                sx={{ mx: (theme) => theme.spacing(2) }}
-              >
-                <MoreVert />
-              </IconButton>
-            </Toolbar>
-          </BackgroundColorScrollToolbar>
-        </AppBar>
-      </ElevationScrollAppBar>
-      <NoteContent
-        title={title}
-        onTitleChange={handleTitleChange}
-        content={content}
-        onContentChange={handleContentChange}
-        dateCreated={currentNote.createdAt}
-        lastModified={currentNote.lastModified}
+            <BackgroundColorScrollToolbar
+              sx={{ justifyContent: 'space-between' }}
+            >
+              <Toolbar>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  onClick={handleClose}
+                  aria-label="close"
+                  sx={{ mx: (theme) => theme.spacing(2) }}
+                >
+                  <Close />
+                </IconButton>
+                <Stack direction="row" alignItems="center">
+                  <Button
+                    variant="text"
+                    sx={{ typography: 'body-l', textTransform: 'capitalize' }}
+                  >
+                    Save
+                  </Button>
+                  <IconButton
+                    edge="end"
+                    color="inherit"
+                    onClick={handleOptionsClick}
+                    aria-label="close"
+                    sx={{ mx: (theme) => theme.spacing(2) }}
+                  >
+                    <MoreVert />
+                  </IconButton>
+                  <NoteMenu
+                    anchorEl={anchorEl}
+                    isArchived={Boolean(currentNote.archivedAt)}
+                    open={openOptionsMenu}
+                    onClose={handleCloseOptionsMenu}
+                    onArchiveToggleClick={handleArchiveToggle}
+                    onDeleteClick={handleDeleteClick}
+                  />
+                </Stack>
+              </Toolbar>
+            </BackgroundColorScrollToolbar>
+          </AppBar>
+        </ElevationScrollAppBar>
+        <NoteContent
+          title={title}
+          onTitleChange={handleTitleChange}
+          content={content}
+          onContentChange={handleContentChange}
+          dateCreated={currentNote.createdAt}
+          lastModified={currentNote.lastModified}
+        />
+      </Dialog>
+      <DeleteNoteDialog
+        open={openDeleteNoteDialog}
+        onClose={handleCloseDeleteNoteDialog}
       />
-    </Dialog>
+    </>
   );
 }
