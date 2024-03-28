@@ -201,7 +201,6 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
         </Drawer>
       </Box>
       <Box
-        component="main"
         sx={{
           flexGrow: 1,
           p: 3,

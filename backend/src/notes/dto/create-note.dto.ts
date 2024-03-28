@@ -24,9 +24,6 @@ export class CreateNoteDto {
   @OnlyOneEmpty('title', { message: EMPTY_NOTE_ERROR })
   content: string;
 
-  @IsBoolean()
-  archived: boolean;
-
   @IsNumber({ allowNaN: false, maxDecimalPlaces: 0 }, { each: true })
   @Min(1, { each: true })
   categories: number[];

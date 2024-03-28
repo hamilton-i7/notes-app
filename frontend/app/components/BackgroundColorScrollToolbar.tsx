@@ -6,7 +6,7 @@ export default function BackgroundColorScrollToolbar({
   sx,
 }: {
   children: React.ReactElement;
-  sx: SxProps<Theme>;
+  sx?: SxProps<Theme>;
 }) {
   const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 0 });
   return cloneElement(children, {

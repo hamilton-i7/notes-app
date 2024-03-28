@@ -1,4 +1,4 @@
-import { ARCHIVED_NOTES_KET } from '@/app/lib/constants';
+import { ARCHIVED_NOTES_KEY } from '@/app/lib/constants';
 import {
   HydrationBoundary,
   QueryClient,
@@ -12,7 +12,7 @@ export default async function ArchivedNotesPage() {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: [ARCHIVED_NOTES_KET],
+    queryKey: [ARCHIVED_NOTES_KEY],
     queryFn: getArchivedNotes,
   });
   return (

@@ -19,9 +19,6 @@ export default function NoteCard({
   note,
   onNoteClick = () => {},
 }: NoteCardProps) {
-  const currentYear = new Date(Date.now()).getFullYear();
-  const isCurrentYear = new Date(note.createdAt).getFullYear() === currentYear;
-
   return (
     <Card
       elevation={0}
