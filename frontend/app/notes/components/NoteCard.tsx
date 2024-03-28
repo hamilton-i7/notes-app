@@ -1,16 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Note } from '../models/note.model';
 import {
   Box,
   Card,
   CardActionArea,
   CardContent,
-  Chip,
   Typography,
 } from '@mui/material';
 import DateText from './DateCreated';
-import { Stack } from '@mui/system';
 import CategoryChips from '@/app/categories/components/CategoryChips';
+import { NotesContext } from '../NotesContext';
 
 type NoteCardProps = {
   note: Note;
@@ -21,6 +20,13 @@ export default function NoteCard({
   note,
   onNoteClick = () => {},
 }: NoteCardProps) {
+  const { setDisplayAddNote } = useContext(NotesContext);
+
+  const handleNoteClick = (id: number) => {
+    setDisplayAddNote(false);
+    onNoteClick(id);
+  };
+
   return (
     <Card
       elevation={0}
@@ -29,7 +35,7 @@ export default function NoteCard({
         borderRadius: (theme) => theme.spacing(3),
       }}
     >
-      <CardActionArea onClick={() => onNoteClick(note.id)}>
+      <CardActionArea onClick={() => handleNoteClick(note.id)}>
         <CardContent>
           <Box
             sx={{

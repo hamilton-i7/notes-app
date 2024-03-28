@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -11,7 +10,7 @@ import List from '@mui/material/List';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Stack } from '@mui/material';
+import { Stack, useMediaQuery, useTheme } from '@mui/material';
 import {
   Archive,
   Home,
@@ -39,6 +38,9 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+
+  const theme = useTheme();
+  const isBeyondSmallScreen = useMediaQuery(theme.breakpoints.up('sm'));
 
   const { data: categories, isPending, isError, error } = useGetCategories();
 
@@ -111,6 +113,12 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
     setCurrentURL(pathname);
   }, [pathname, searchParams]);
 
+  useEffect(() => {
+    if (!isBeyondSmallScreen) return;
+    handleDrawerTransitionEnd();
+    setMobileOpen(false);
+  }, [isBeyondSmallScreen]);
+
   const drawer = (
     <aside>
       <Stack
@@ -162,7 +170,6 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
       <ElevationScrollAppBar>
         <AppBar
           position="fixed"
@@ -170,6 +177,7 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
             width: { sm: `calc(100% - ${drawerWidth}px)` },
             ml: { sm: `${drawerWidth}px` },
             color: (theme) => theme.palette.background.onSurface,
+            display: { lg: 'none' },
           }}
         >
           <BackgroundColorScrollToolbar>
@@ -242,11 +250,11 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       <Box
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { sm: 3, lg: 0 },
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
-        <Toolbar />
+        <Toolbar sx={{ display: { lg: 'none' } }} />
         {children}
       </Box>
     </Box>

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { NotesContext } from './NotesContext';
 import { Note } from './models/note.model';
+import { Stack } from '@mui/material';
 
 export default function NotesLayout({
   children,
@@ -25,9 +26,10 @@ export default function NotesLayout({
         setDisplayAddNote,
       }}
     >
-      {children}
-      {currentNoteId && note}
-      {displayAddNote && addNote}
+      <Stack direction="row" sx={{ height: { lg: '100vh' } }}>
+        {children}
+        {displayAddNote ? addNote : note}
+      </Stack>
     </NotesContext.Provider>
   );
 }

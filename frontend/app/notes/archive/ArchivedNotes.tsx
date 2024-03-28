@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useContext } from 'react';
-import { Grid, Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useGetArchivedNotes } from '../notes.hook';
 import NoteCard from '../components/NoteCard';
 import { NotesContext } from '../NotesContext';
@@ -23,6 +23,9 @@ export default function ArchivedNotes() {
       sx={{
         p: (theme) => theme.spacing(4),
         bgcolor: (theme) => theme.palette.background.main,
+        maxWidth: (theme) => ({ lg: theme.spacing(100) }),
+        flex: { lg: 1 },
+        overflowY: { lg: 'scroll' },
       }}
     >
       <Stack spacing={4}>

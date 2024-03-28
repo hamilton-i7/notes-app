@@ -11,9 +11,11 @@ import {
   Slide,
   Stack,
   Snackbar,
+  Box,
+  Typography,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { Close, MoreVert } from '@mui/icons-material';
+import { Close, Description, MoreVert } from '@mui/icons-material';
 import ElevationScrollAppBar from '@/app/components/ElevationScrollAppBar';
 import BackgroundColorScrollToolbar from '@/app/components/BackgroundColorScrollToolbar';
 import NoteContent from './components/NoteContent';
@@ -166,7 +168,7 @@ export default function NotePage() {
     updateNote(
       { id: note!.id, note: noteDto },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: [NOTES_KEY],
           });
@@ -190,6 +192,10 @@ export default function NotePage() {
     setContent(note.content);
   }, [note]);
 
+  if (!currentNoteId) {
+    return <EmptyState />;
+  }
+
   if (isPending) {
     return <div>Loading...</div>;
   }
@@ -197,6 +203,71 @@ export default function NotePage() {
   if (isError) {
     return <div>Error {error.message}</div>;
   }
+
+  const pageContent = (
+    <>
+      <ElevationScrollAppBar>
+        <AppBar
+          sx={{
+            position: 'relative',
+            color: (theme) => theme.palette.background.onSurface,
+          }}
+        >
+          <BackgroundColorScrollToolbar
+            sx={{ justifyContent: 'space-between' }}
+          >
+            <Toolbar>
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={handleClose}
+                aria-label="close"
+                sx={{ mx: (theme) => theme.spacing(2) }}
+              >
+                <Close />
+              </IconButton>
+              <Stack direction="row" alignItems="center">
+                <Button
+                  variant="text"
+                  onClick={handleUpdateNote}
+                  sx={{ typography: 'body-l', textTransform: 'capitalize' }}
+                >
+                  Save
+                </Button>
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={handleOptionsClick}
+                  aria-label="close"
+                  sx={{ mx: (theme) => theme.spacing(2) }}
+                >
+                  <MoreVert />
+                </IconButton>
+                <NoteMenu
+                  anchorEl={anchorEl}
+                  isArchived={Boolean(note.archivedAt)}
+                  open={openOptionsMenu}
+                  onClose={handleCloseOptionsMenu}
+                  onArchiveToggleClick={handleArchiveToggle}
+                  onDeleteClick={handleDeleteClick}
+                  onCategoriesClick={handleCategoriesClick}
+                />
+              </Stack>
+            </Toolbar>
+          </BackgroundColorScrollToolbar>
+        </AppBar>
+      </ElevationScrollAppBar>
+      <NoteContent
+        title={title}
+        onTitleChange={handleTitleChange}
+        content={content}
+        onContentChange={handleContentChange}
+        dateCreated={note.createdAt}
+        lastModified={note.lastModified}
+        categories={note.categories}
+      />
+    </>
+  );
 
   return (
     <>
@@ -206,72 +277,27 @@ export default function NotePage() {
         onClose={handleClose}
         TransitionComponent={Transition}
         sx={{
+          display: { xs: 'block', lg: 'none' },
           '& .MuiPaper-root': {
             bgcolor: (theme) => theme.palette.background.surface,
           },
         }}
       >
-        <ElevationScrollAppBar>
-          <AppBar
-            sx={{
-              position: 'relative',
-              color: (theme) => theme.palette.background.onSurface,
-            }}
-          >
-            <BackgroundColorScrollToolbar
-              sx={{ justifyContent: 'space-between' }}
-            >
-              <Toolbar>
-                <IconButton
-                  edge="start"
-                  color="inherit"
-                  onClick={handleClose}
-                  aria-label="close"
-                  sx={{ mx: (theme) => theme.spacing(2) }}
-                >
-                  <Close />
-                </IconButton>
-                <Stack direction="row" alignItems="center">
-                  <Button
-                    variant="text"
-                    onClick={handleUpdateNote}
-                    sx={{ typography: 'body-l', textTransform: 'capitalize' }}
-                  >
-                    Save
-                  </Button>
-                  <IconButton
-                    edge="end"
-                    color="inherit"
-                    onClick={handleOptionsClick}
-                    aria-label="close"
-                    sx={{ mx: (theme) => theme.spacing(2) }}
-                  >
-                    <MoreVert />
-                  </IconButton>
-                  <NoteMenu
-                    anchorEl={anchorEl}
-                    isArchived={Boolean(note.archivedAt)}
-                    open={openOptionsMenu}
-                    onClose={handleCloseOptionsMenu}
-                    onArchiveToggleClick={handleArchiveToggle}
-                    onDeleteClick={handleDeleteClick}
-                    onCategoriesClick={handleCategoriesClick}
-                  />
-                </Stack>
-              </Toolbar>
-            </BackgroundColorScrollToolbar>
-          </AppBar>
-        </ElevationScrollAppBar>
-        <NoteContent
-          title={title}
-          onTitleChange={handleTitleChange}
-          content={content}
-          onContentChange={handleContentChange}
-          dateCreated={note.createdAt}
-          lastModified={note.lastModified}
-          categories={note.categories}
-        />
+        {pageContent}
       </Dialog>
+
+      <Box
+        sx={{
+          display: { xs: 'none', lg: 'flex' },
+          flexDirection: { lg: 'column' },
+          flex: { lg: 2 },
+          borderLeft: (theme) =>
+            `${theme.spacing(0.25)} solid ${theme.palette.outline}`,
+        }}
+      >
+        {pageContent}
+      </Box>
+
       <CategoriesDialog
         open={openCategoriesDialog}
         onClose={handleCloseCategoriesDialog}
@@ -288,5 +314,44 @@ export default function NotePage() {
         action={useSnackbarAction ? snackbarAction : null}
       />
     </>
+  );
+}
+
+function EmptyState() {
+  return (
+    <Stack
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        display: { xs: 'none', lg: 'flex' },
+        borderLeft: (theme) =>
+          `${theme.spacing(0.25)} solid ${theme.palette.outline}`,
+        p: (theme) => theme.spacing(4),
+        textAlign: 'center',
+        flex: { lg: 2 },
+      }}
+    >
+      <Description
+        sx={{
+          fontSize: (theme) => theme.spacing(20),
+          mb: (theme) => theme.spacing(3),
+        }}
+      />
+      <Typography
+        variant="heading-l"
+        component="h2"
+        sx={{ mb: (theme) => theme.spacing(3) }}
+      >
+        Select a note to view
+      </Typography>
+      <Typography
+        paragraph
+        variant="body-l"
+        sx={{ color: (theme) => theme.palette.background.onSurfaceVariant }}
+      >
+        Choose a note from the list on the left to view its contents, or create
+        a new note to add to your collection.
+      </Typography>
+    </Stack>
   );
 }

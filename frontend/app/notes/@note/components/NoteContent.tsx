@@ -24,7 +24,14 @@ export default function NoteContent({
   categories = [],
 }: NoteContentProps) {
   return (
-    <Stack sx={{ p: (theme) => theme.spacing(4), height: '100%' }}>
+    <Stack
+      sx={{
+        p: (theme) => theme.spacing(4),
+        height: { xs: '100%', lg: 'auto' },
+        flex: { lg: 1 },
+        overflowY: 'hidden',
+      }}
+    >
       {dateCreated && (
         <Box sx={{ mb: (theme) => theme.spacing(4) }}>
           <DateText date={dateCreated} prefix="Created on: " />
@@ -69,11 +76,13 @@ export default function NoteContent({
           }}
         />
         {Boolean(categories.length) && (
-          <CategoryChips categories={categories} />
+          <Box sx={{ mb: (theme) => theme.spacing(4) }}>
+            <CategoryChips categories={categories} />
+          </Box>
         )}
       </Stack>
       {lastModified && (
-        <Box sx={{ mt: (theme) => theme.spacing(4), alignSelf: 'center' }}>
+        <Box sx={{ mt: (theme) => theme.spacing(4), textAlign: 'center' }}>
           <DateText date={lastModified} prefix="Last modified on: " />
         </Box>
       )}

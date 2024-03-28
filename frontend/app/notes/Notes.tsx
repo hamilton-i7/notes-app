@@ -2,17 +2,20 @@
 
 import React, { useContext } from 'react';
 import { useGetNotes, useGetNotesByCategories } from './notes.hook';
-import { Button, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import NoteCard from './components/NoteCard';
 import { NotesContext } from './NotesContext';
 import { Add } from '@mui/icons-material';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Sunlight from '../../public/sunlight.svg';
 
 function ContentWrapper({ children }: { children: React.ReactNode }) {
-  const { setDisplayAddNote } = useContext(NotesContext);
+  const { setDisplayAddNote, setCurrentNoteId } = useContext(NotesContext);
 
   const handleCreateNoteClick = () => {
     setDisplayAddNote(true);
+    setCurrentNoteId(null);
   };
 
   return (
@@ -21,6 +24,8 @@ function ContentWrapper({ children }: { children: React.ReactNode }) {
       sx={{
         p: (theme) => theme.spacing(4),
         bgcolor: (theme) => theme.palette.background.main,
+        flex: { lg: 1 },
+        overflowY: { lg: 'scroll' },
       }}
     >
       <Button
@@ -71,8 +76,12 @@ export default function Notes() {
       return <main>Error: {filterError.message}</main>;
     }
 
+    const isEmpty =
+      filteredNotes.active.length === 0 && filteredNotes.archived.length === 0;
+
     return (
       <ContentWrapper>
+        {isEmpty && <EmptyState />}
         {filteredNotes.active.map((note) => (
           <NoteCard key={note.id} note={note} onNoteClick={setCurrentNoteId} />
         ))}
@@ -110,9 +119,21 @@ export default function Notes() {
 
   return (
     <ContentWrapper>
-      {notes.map((note) => (
-        <NoteCard key={note.id} note={note} onNoteClick={setCurrentNoteId} />
-      ))}
+      {notes.length > 0 ? (
+        notes.map((note) => (
+          <NoteCard key={note.id} note={note} onNoteClick={setCurrentNoteId} />
+        ))
+      ) : (
+        <EmptyState />
+      )}
     </ContentWrapper>
+  );
+}
+
+function EmptyState() {
+  return (
+    <Box sx={{ alignSelf: 'center', pt: (theme) => theme.spacing(8) }}>
+      <Image src={Sunlight} alt="Womant staring at the sun" width={200} />
+    </Box>
   );
 }
