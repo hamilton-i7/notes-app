@@ -5,9 +5,12 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  Chip,
   Typography,
 } from '@mui/material';
 import DateText from './DateCreated';
+import { Stack } from '@mui/system';
+import CategoryChips from '@/app/categories/components/CategoryChips';
 
 type NoteCardProps = {
   note: Note;
@@ -67,6 +70,8 @@ export default function NoteCard({
           >
             {note.content}
           </Typography>
+
+          <CategoryChips categories={note.categories} />
         </CardContent>
       </CardActionArea>
     </Card>

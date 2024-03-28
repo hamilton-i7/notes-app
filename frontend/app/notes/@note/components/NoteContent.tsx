@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Stack, TextField } from '@mui/material';
 import DateText from '../../components/DateCreated';
+import CategoryChips from '@/app/categories/components/CategoryChips';
+import { Category } from '@/app/categories/models/category.model';
 
 type NoteContentProps = {
   title?: string;
@@ -9,6 +11,7 @@ type NoteContentProps = {
   onContentChange?: (content: string) => void;
   dateCreated?: string;
   lastModified?: string;
+  categories?: Category[];
 };
 
 export default function NoteContent({
@@ -18,6 +21,7 @@ export default function NoteContent({
   onContentChange = () => {},
   dateCreated,
   lastModified,
+  categories = [],
 }: NoteContentProps) {
   return (
     <Stack sx={{ p: (theme) => theme.spacing(4), height: '100%' }}>
@@ -52,6 +56,7 @@ export default function NoteContent({
           onChange={(event) => onContentChange(event.target.value)}
           sx={{
             flex: 1,
+            mb: (theme) => theme.spacing(6),
             '& .MuiInputBase-root': {
               p: 0,
               height: '100%',
@@ -63,6 +68,7 @@ export default function NoteContent({
             },
           }}
         />
+        {categories.length && <CategoryChips categories={categories} />}
       </Stack>
       {lastModified && (
         <Box sx={{ mt: (theme) => theme.spacing(4), alignSelf: 'center' }}>

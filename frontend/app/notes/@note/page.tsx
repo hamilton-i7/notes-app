@@ -269,6 +269,7 @@ export default function NotePage() {
           onContentChange={handleContentChange}
           dateCreated={note.createdAt}
           lastModified={note.lastModified}
+          categories={note.categories}
         />
       </Dialog>
       <CategoriesDialog

@@ -53,8 +53,12 @@ export default function CategoriesDialog({
 
   const handleSave = () => {
     const noteDto: UpdateNoteDto = {
-      categories: Object.keys(selectedCategories).map((id) => +id),
+      categories: Object.keys(selectedCategories)
+        .filter((id) => selectedCategories[+id])
+        .map((id) => +id),
     };
+
+    console.log(noteDto.categories);
 
     updateNote(
       { id: note!.id, note: noteDto },
