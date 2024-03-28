@@ -1,29 +1,29 @@
 'use client';
 
-import React, { useState, cloneElement, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Stack, Theme, useScrollTrigger } from '@mui/material';
-import { Archive, Home, TipsAndUpdates } from '@mui/icons-material';
+import { Stack } from '@mui/material';
+import {
+  Archive,
+  Home,
+  LabelOutlined,
+  TipsAndUpdates,
+} from '@mui/icons-material';
 import DrawerItem from './DrawerItem';
 import { Destination } from '../lib/models/destination.model';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import ElevationScrollAppBar from './ElevationScrollAppBar';
 import BackgroundColorScrollToolbar from './BackgroundColorScrollToolbar';
+import { useGetCategories } from '../categories/categories.hook';
 
 const drawerWidth = 280;
 
@@ -33,8 +33,14 @@ interface NotesDrawerProps {
 
 export default function NotesDrawer({ children }: NotesDrawerProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [currentURL, setCurrentURL] = useState('');
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+
+  const { data: categories, isPending, isError, error } = useGetCategories();
 
   const mainDestinations: Destination[] = [
     { icon: <Home />, text: 'Home', href: '/notes', path: '/notes' },
@@ -45,6 +51,9 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       path: '/notes/archive',
     },
   ];
+  const [categoryDestinations, setCategoryDestinations] = useState<
+    (Destination & { id: number })[]
+  >([]);
   const [currentPageTitle, setCurrentPageTitle] = useState('');
 
   const handleDrawerClose = () => {
@@ -63,6 +72,14 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
   };
 
   useEffect(() => {
+    if (searchParams.has('categories') && categories) {
+      const categoryId = searchParams.get('categories')!;
+      setCurrentPageTitle(
+        categories.find(({ id }) => id === +categoryId)?.name ?? ''
+      );
+      return;
+    }
+
     switch (pathname) {
       case '/notes':
         setCurrentPageTitle('Home');
@@ -70,7 +87,29 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       case '/notes/archive':
         setCurrentPageTitle('Archive');
     }
-  }, [pathname]);
+  }, [pathname, searchParams, categories]);
+
+  useEffect(() => {
+    if (!categories) return;
+    setCategoryDestinations(
+      categories.map((category) => ({
+        id: category.id,
+        icon: <LabelOutlined />,
+        text: category.name,
+        href: `/notes?categories=${category.id}`,
+        path: `/notes?categories=${category.id}`,
+      }))
+    );
+  }, [categories]);
+
+  useEffect(() => {
+    if (searchParams.has('categories')) {
+      const categoryId = searchParams.get('categories')!;
+      setCurrentURL(`${pathname}?categories=${categoryId}`);
+      return;
+    }
+    setCurrentURL(pathname);
+  }, [pathname, searchParams]);
 
   const drawer = (
     <aside>
@@ -93,7 +132,7 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
           <DrawerItem
             key={index}
             destination={destination}
-            selected={pathname === destination.path}
+            selected={currentURL === destination.path}
             onClick={handleDrawerClose}
           />
         ))}
@@ -107,15 +146,15 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
         Categories
       </Typography>
       <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {isPending && <div>Loading categories...</div>}
+        {isError && <div>Error fetching categories: {error.message}</div>}
+        {categoryDestinations.map((category) => (
+          <DrawerItem
+            key={category.id}
+            destination={category}
+            selected={currentURL === category.path}
+            onClick={handleDrawerClose}
+          />
         ))}
       </List>
     </aside>
