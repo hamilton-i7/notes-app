@@ -1,12 +1,14 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ARCHIVED_NOTES_KEY, NOTES_KEY } from '../lib/constants';
 import {
   createNote,
   deleteNote,
   getArchivedNotes,
   getNotes,
+  updateNote,
 } from './notes.api';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-note.dto';
 
 export const useGetNotes = () => {
   return useQuery({
@@ -23,8 +25,23 @@ export const useGetArchivedNotes = () => {
 };
 
 export const useCreateNote = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (note: CreateNoteDto) => createNote(note),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [NOTES_KEY] });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+};
+
+export const useUpdateNote = () => {
+  return useMutation({
+    mutationFn: ({ id, note }: { id: number; note: UpdateNoteDto }) =>
+      updateNote(id, note),
     onError: (error) => {
       console.log(error);
     },
