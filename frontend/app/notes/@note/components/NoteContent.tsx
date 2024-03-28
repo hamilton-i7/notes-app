@@ -68,7 +68,9 @@ export default function NoteContent({
             },
           }}
         />
-        {categories.length && <CategoryChips categories={categories} />}
+        {Boolean(categories.length) && (
+          <CategoryChips categories={categories} />
+        )}
       </Stack>
       {lastModified && (
         <Box sx={{ mt: (theme) => theme.spacing(4), alignSelf: 'center' }}>

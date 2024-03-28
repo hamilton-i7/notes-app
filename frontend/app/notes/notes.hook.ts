@@ -76,7 +76,15 @@ export const useUpdateNote = () => {
 };
 
 export const useDeleteNote = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (id: number) => deleteNote(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [NOTES_KEY] });
+      queryClient.invalidateQueries({
+        queryKey: [NOTES_KEY, { archived: true }],
+      });
+    },
   });
 };
