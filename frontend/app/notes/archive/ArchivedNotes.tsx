@@ -23,7 +23,6 @@ export default function ArchivedNotes() {
       sx={{
         p: (theme) => theme.spacing(4),
         bgcolor: (theme) => theme.palette.background.main,
-        maxWidth: (theme) => ({ lg: theme.spacing(100) }),
         flex: { lg: 1 },
         overflowY: { lg: 'scroll' },
       }}

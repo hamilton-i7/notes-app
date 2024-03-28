@@ -26,6 +26,7 @@ import { UpdateNoteDto } from '../dto/update-note.dto';
 import { useQueryClient } from '@tanstack/react-query';
 import { NOTES_KEY } from '@/app/lib/constants';
 import CategoriesDialog from '@/app/categories/components/CategoriesDialog';
+import EmptyState from './components/EmptyState';
 
 const SNACKBAR_DURATION = 3_000;
 
@@ -130,7 +131,7 @@ export default function NotePage() {
     updateNote(
       { id: note!.id, note: noteDto },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: [NOTES_KEY],
           });
@@ -315,44 +316,5 @@ export default function NotePage() {
         action={useSnackbarAction ? snackbarAction : null}
       />
     </>
-  );
-}
-
-function EmptyState() {
-  return (
-    <Stack
-      alignItems="center"
-      justifyContent="center"
-      sx={{
-        display: { xs: 'none', lg: 'flex' },
-        borderLeft: (theme) =>
-          `${theme.spacing(0.25)} solid ${theme.palette.outline}`,
-        p: (theme) => theme.spacing(4),
-        textAlign: 'center',
-        flex: { lg: 2 },
-      }}
-    >
-      <Description
-        sx={{
-          fontSize: (theme) => theme.spacing(20),
-          mb: (theme) => theme.spacing(3),
-        }}
-      />
-      <Typography
-        variant="heading-l"
-        component="h2"
-        sx={{ mb: (theme) => theme.spacing(3) }}
-      >
-        Select a note to view
-      </Typography>
-      <Typography
-        paragraph
-        variant="body-l"
-        sx={{ color: (theme) => theme.palette.background.onSurfaceVariant }}
-      >
-        Choose a note from the list on the left to view its contents, or create
-        a new note to add to your collection.
-      </Typography>
-    </Stack>
   );
 }
