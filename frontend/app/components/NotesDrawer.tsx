@@ -22,29 +22,13 @@ import { Archive, Home, TipsAndUpdates } from '@mui/icons-material';
 import DrawerItem from './DrawerItem';
 import { Destination } from '../lib/models/destination.model';
 import { usePathname } from 'next/navigation';
+import ElevationScrollAppBar from './ElevationScrollAppBar';
+import BackgroundColorScrollToolbar from './BackgroundColorScrollToolbar';
 
 const drawerWidth = 280;
 
 interface NotesDrawerProps {
   children: React.ReactNode;
-}
-
-function BackgroundColorScrollToolbar({
-  children,
-}: {
-  children: React.ReactElement;
-}) {
-  const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 0 });
-  return cloneElement(children, {
-    sx: trigger
-      ? { bgcolor: (theme: Theme) => theme.palette.background.surfaceVariant }
-      : { bgcolor: (theme: Theme) => theme.palette.background.main },
-  });
-}
-
-function ElevationScrollAppBar({ children }: { children: React.ReactElement }) {
-  const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 0 });
-  return cloneElement(children, { elevation: trigger ? 1 : 0 });
 }
 
 export default function NotesDrawer({ children }: NotesDrawerProps) {
@@ -156,7 +140,10 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
                 aria-label="open drawer"
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mx: 2, display: { sm: 'none' } }}
+                sx={{
+                  mx: (theme) => theme.spacing(2),
+                  display: { sm: 'none' },
+                }}
               >
                 <MenuIcon />
               </IconButton>

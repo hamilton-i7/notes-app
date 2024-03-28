@@ -1,18 +1,26 @@
 import React from 'react';
 import { Note } from '../models/note.model';
-import { Card, CardContent, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  Typography,
+} from '@mui/material';
 import dayjs from 'dayjs';
+import DateText from './DateCreated';
 
 type NoteCardProps = {
   note: Note;
+  onNoteClick?: (note: Note) => void;
 };
 
-export default function NoteCard({ note }: NoteCardProps) {
+export default function NoteCard({
+  note,
+  onNoteClick = () => {},
+}: NoteCardProps) {
   const currentYear = new Date(Date.now()).getFullYear();
   const isCurrentYear = new Date(note.createdAt).getFullYear() === currentYear;
-  const dateCreated = dayjs(note.createdAt).format(
-    isCurrentYear ? 'D MMM' : 'D MMM, YYYY'
-  );
 
   return (
     <Card
@@ -22,47 +30,49 @@ export default function NoteCard({ note }: NoteCardProps) {
         borderRadius: (theme) => theme.spacing(3),
       }}
     >
-      <CardContent>
-        <Typography
-          variant="body-m"
-          sx={{
-            mb: (theme) => theme.spacing(2),
-            color: (theme) => theme.palette.outline,
-          }}
-        >
-          {dateCreated}
-        </Typography>
-        <Typography
-          variant="heading-m"
-          component="h3"
-          sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: '1',
-            WebkitBoxOrient: 'vertical',
-            mb: (theme) => theme.spacing(3),
-            color: (theme) => theme.palette.background.onSurfaceVariant,
-          }}
-        >
-          {note.title}
-        </Typography>
-        <Typography
-          color="text.secondary"
-          variant="body-l"
-          paragraph
-          sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: '2',
-            WebkitBoxOrient: 'vertical',
-            color: (theme) => theme.palette.outline,
-          }}
-        >
-          {note.content}
-        </Typography>
-      </CardContent>
+      <CardActionArea onClick={() => onNoteClick(note)}>
+        <CardContent>
+          <Box
+            sx={{
+              mb: (theme) => theme.spacing(2),
+            }}
+          >
+            {' '}
+            <DateText date={note.createdAt} />
+          </Box>
+
+          <Typography
+            variant="heading-m"
+            component="h3"
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: '1',
+              WebkitBoxOrient: 'vertical',
+              mb: (theme) => theme.spacing(3),
+              color: (theme) => theme.palette.background.onSurfaceVariant,
+            }}
+          >
+            {note.title}
+          </Typography>
+          <Typography
+            color="text.secondary"
+            variant="body-l"
+            paragraph
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: '2',
+              WebkitBoxOrient: 'vertical',
+              color: (theme) => theme.palette.outline,
+            }}
+          >
+            {note.content}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
     </Card>
   );
 }

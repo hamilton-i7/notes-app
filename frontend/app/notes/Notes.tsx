@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { useGetNotes } from './notes.hook';
-import { Grid, Stack, Typography } from '@mui/material';
+import { Grid, Stack } from '@mui/material';
 import NoteCard from './components/NoteCard';
+import { NotesContext } from './NotesContext';
 
 export default function Notes() {
   const { data: notes, isPending, isError, error } = useGetNotes();
+  const { setCurrentNote } = useContext(NotesContext);
 
   if (isPending) {
     return <main>Loading...</main>;
@@ -26,7 +28,7 @@ export default function Notes() {
       <Grid container spacing={4}>
         {notes.map((note) => (
           <Grid key={note.id} item xs={12}>
-            <NoteCard note={note} />
+            <NoteCard note={note} onNoteClick={setCurrentNote} />
           </Grid>
         ))}
       </Grid>
