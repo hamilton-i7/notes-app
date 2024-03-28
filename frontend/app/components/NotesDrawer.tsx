@@ -23,6 +23,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import ElevationScrollAppBar from './ElevationScrollAppBar';
 import BackgroundColorScrollToolbar from './BackgroundColorScrollToolbar';
 import { useGetCategories } from '../categories/categories.hook';
+import DrawerItemSkeleton from './DrawerItemSkeleton';
 
 const drawerWidth = 280;
 
@@ -67,10 +68,8 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
     setIsClosing(false);
   };
 
-  const handleDrawerToggle = () => {
-    if (!isClosing) {
-      setMobileOpen(!mobileOpen);
-    }
+  const handleDrawerOpen = () => {
+    setMobileOpen(true);
   };
 
   useEffect(() => {
@@ -154,7 +153,13 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
         Categories
       </Typography>
       <List>
-        {isPending && <div>Loading categories...</div>}
+        {isPending && (
+          <>
+            {Array.from(Array(5)).map((_, i) => (
+              <DrawerItemSkeleton key={i} />
+            ))}
+          </>
+        )}
         {isError && <div>Error fetching categories: {error.message}</div>}
         {categoryDestinations.map((category) => (
           <DrawerItem
@@ -186,7 +191,7 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
                 color="inherit"
                 aria-label="open drawer"
                 edge="start"
-                onClick={handleDrawerToggle}
+                onClick={handleDrawerOpen}
                 sx={{
                   mx: (theme) => theme.spacing(2),
                   display: { sm: 'none' },

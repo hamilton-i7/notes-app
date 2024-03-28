@@ -8,6 +8,8 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
+  Skeleton,
+  Typography,
 } from '@mui/material';
 import { useGetCategories } from '../categories.hook';
 import { NotesContext } from '@/app/notes/NotesContext';
@@ -16,6 +18,7 @@ import { useGetNote, useUpdateNote } from '@/app/notes/notes.hook';
 import { UpdateNoteDto } from '@/app/notes/dto/update-note.dto';
 import { useQueryClient } from '@tanstack/react-query';
 import { NOTES_KEY } from '@/app/lib/constants';
+import DrawerItemSkeleton from '@/app/components/DrawerItemSkeleton';
 
 type CategoriesDialogProps = {
   open: boolean;
@@ -105,7 +108,12 @@ export default function CategoriesDialog({
       <DialogTitle>Categories</DialogTitle>
       <DialogContent dividers>
         <FormGroup>
-          {isPending && <div>Categories loading...</div>}
+          {isPending &&
+            Array.from(Array(5)).map((_, i) => (
+              <Typography key={i} variant="heading-xl">
+                <Skeleton />
+              </Typography>
+            ))}
           {isError && <div>Error {error.message}</div>}
           {isSuccess &&
             categories.map((category) => (

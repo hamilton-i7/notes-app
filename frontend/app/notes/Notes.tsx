@@ -9,6 +9,7 @@ import { Add } from '@mui/icons-material';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Sunlight from '../../public/sunlight.svg';
+import NoteCardSkeleton from './components/NoteCardSkeleton';
 
 function ContentWrapper({ children }: { children: React.ReactNode }) {
   const { setDisplayAddNote, setCurrentNoteId } = useContext(NotesContext);
@@ -26,6 +27,7 @@ function ContentWrapper({ children }: { children: React.ReactNode }) {
         bgcolor: (theme) => theme.palette.background.main,
         flex: { lg: 1 },
         overflowY: { lg: 'scroll' },
+        width: { xs: '100%', lg: 'auto' },
       }}
     >
       <Button
@@ -69,7 +71,13 @@ export default function Notes() {
 
   if (searchParams.has('categories')) {
     if (isFilterPending) {
-      return <main>Loading filter...</main>;
+      return (
+        <ContentWrapper>
+          {Array.from(Array(3)).map((_, i) => (
+            <NoteCardSkeleton key={i} />
+          ))}
+        </ContentWrapper>
+      );
     }
 
     if (isFilterError) {
@@ -110,7 +118,13 @@ export default function Notes() {
   }
 
   if (isPending) {
-    return <main>Loading...</main>;
+    return (
+      <ContentWrapper>
+        {Array.from(Array(3)).map((_, i) => (
+          <NoteCardSkeleton key={i} />
+        ))}
+      </ContentWrapper>
+    );
   }
 
   if (isError) {
