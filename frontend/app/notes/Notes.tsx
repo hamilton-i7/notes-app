@@ -36,9 +36,7 @@ function ContentWrapper({ children }: { children: React.ReactNode }) {
       >
         Create note
       </Button>
-      <Grid container spacing={4}>
-        {children}
-      </Grid>
+      <Stack spacing={4}>{children}</Stack>
     </Stack>
   );
 }
@@ -76,9 +74,7 @@ export default function Notes() {
     return (
       <ContentWrapper>
         {filteredNotes.active.map((note) => (
-          <Grid key={note.id} item xs={12}>
-            <NoteCard note={note} onNoteClick={setCurrentNoteId} />
-          </Grid>
+          <NoteCard key={note.id} note={note} onNoteClick={setCurrentNoteId} />
         ))}
         {filteredNotes.archived.length > 0 && (
           <>
@@ -92,9 +88,11 @@ export default function Notes() {
               Archived
             </Typography>
             {filteredNotes.archived.map((note) => (
-              <Grid key={note.id} item xs={12}>
-                <NoteCard note={note} onNoteClick={setCurrentNoteId} />
-              </Grid>
+              <NoteCard
+                key={note.id}
+                note={note}
+                onNoteClick={setCurrentNoteId}
+              />
             ))}
           </>
         )}
@@ -113,9 +111,7 @@ export default function Notes() {
   return (
     <ContentWrapper>
       {notes.map((note) => (
-        <Grid key={note.id} item xs={12}>
-          <NoteCard note={note} onNoteClick={setCurrentNoteId} />
-        </Grid>
+        <NoteCard key={note.id} note={note} onNoteClick={setCurrentNoteId} />
       ))}
     </ContentWrapper>
   );

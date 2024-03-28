@@ -25,13 +25,11 @@ export default function ArchivedNotes() {
         bgcolor: (theme) => theme.palette.background.main,
       }}
     >
-      <Grid container spacing={4}>
+      <Stack spacing={4}>
         {notes.map((note) => (
-          <Grid key={note.id} item xs={12}>
-            <NoteCard note={note} onNoteClick={setCurrentNoteId} />
-          </Grid>
+          <NoteCard key={note.id} note={note} onNoteClick={setCurrentNoteId} />
         ))}
-      </Grid>
+      </Stack>
     </Stack>
   );
 }
