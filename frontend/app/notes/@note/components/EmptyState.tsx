@@ -32,7 +32,7 @@ export default function EmptyState() {
       <Typography
         paragraph
         variant="body-l"
-        sx={{ color: (theme) => theme.palette.background.onSurfaceVariant }}
+        sx={{ color: (theme) => theme.palette.outline }}
       >
         Choose a note from the list on the left to view its contents, or create
         a new note to add to your collection.
