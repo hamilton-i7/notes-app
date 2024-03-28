@@ -8,7 +8,7 @@ import { NotesContext } from '../NotesContext';
 
 export default function ArchivedNotes() {
   const { data: notes, isPending, isError, error } = useGetArchivedNotes();
-  const { setCurrentNote } = useContext(NotesContext);
+  const { setCurrentNoteId } = useContext(NotesContext);
 
   if (isPending) {
     return <main>Loading...</main>;
@@ -28,7 +28,7 @@ export default function ArchivedNotes() {
       <Grid container spacing={4}>
         {notes.map((note) => (
           <Grid key={note.id} item xs={12}>
-            <NoteCard note={note} onNoteClick={setCurrentNote} />
+            <NoteCard note={note} onNoteClick={setCurrentNoteId} />
           </Grid>
         ))}
       </Grid>
