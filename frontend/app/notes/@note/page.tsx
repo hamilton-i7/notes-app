@@ -308,6 +308,7 @@ export default function NotePage() {
       />
       <Snackbar
         open={showSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         autoHideDuration={SNACKBAR_DURATION}
         onClose={handleCloseSnakbar}
         message={snackbarMessage}
