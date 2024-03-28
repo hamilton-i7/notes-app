@@ -1,27 +1,20 @@
 'use client';
 
 import React, { useContext } from 'react';
-import { useGetNotes } from './notes.hook';
-import { Button, Grid, Stack } from '@mui/material';
+import { useGetNotes, useGetNotesByCategories } from './notes.hook';
+import { Button, Grid, Stack, Typography } from '@mui/material';
 import NoteCard from './components/NoteCard';
 import { NotesContext } from './NotesContext';
 import { Add } from '@mui/icons-material';
+import { useSearchParams } from 'next/navigation';
 
-export default function Notes() {
-  const { data: notes, isPending, isError, error } = useGetNotes();
-  const { setCurrentNote, setDisplayAddNote } = useContext(NotesContext);
+function ContentWrapper({ children }: { children: React.ReactNode }) {
+  const { setDisplayAddNote } = useContext(NotesContext);
 
   const handleCreateNoteClick = () => {
     setDisplayAddNote(true);
   };
 
-  if (isPending) {
-    return <main>Loading...</main>;
-  }
-
-  if (isError) {
-    return <main>Error: {error.message}</main>;
-  }
   return (
     <Stack
       component="main"
@@ -44,12 +37,86 @@ export default function Notes() {
         Create note
       </Button>
       <Grid container spacing={4}>
-        {notes.map((note) => (
-          <Grid key={note.id} item xs={12}>
-            <NoteCard note={note} onNoteClick={setCurrentNote} />
-          </Grid>
-        ))}
+        {children}
       </Grid>
     </Stack>
+  );
+}
+
+export default function Notes() {
+  const searchParams = useSearchParams();
+  const categoryParams = searchParams.getAll('categories');
+
+  const {
+    data: notes,
+    isPending,
+    isError,
+    error,
+  } = useGetNotes(categoryParams.length === 0);
+  const {
+    data: filteredNotes,
+    isPending: isFilterPending,
+    isError: isFilterError,
+    error: filterError,
+  } = useGetNotesByCategories(
+    categoryParams.map((categoryId) => +categoryId),
+    categoryParams.length > 0
+  );
+  const { setCurrentNoteId } = useContext(NotesContext);
+
+  if (searchParams.has('categories')) {
+    if (isFilterPending) {
+      return <main>Loading filter...</main>;
+    }
+
+    if (isFilterError) {
+      return <main>Error: {filterError.message}</main>;
+    }
+
+    return (
+      <ContentWrapper>
+        {filteredNotes.active.map((note) => (
+          <Grid key={note.id} item xs={12}>
+            <NoteCard note={note} onNoteClick={setCurrentNoteId} />
+          </Grid>
+        ))}
+        {filteredNotes.archived.length > 0 && (
+          <>
+            <Typography
+              variant="body-m"
+              sx={{
+                color: (theme) => theme.palette.outline,
+                m: (theme) => theme.spacing(4, 6, 0),
+              }}
+            >
+              Archived
+            </Typography>
+            {filteredNotes.archived.map((note) => (
+              <Grid key={note.id} item xs={12}>
+                <NoteCard note={note} onNoteClick={setCurrentNoteId} />
+              </Grid>
+            ))}
+          </>
+        )}
+      </ContentWrapper>
+    );
+  }
+
+  if (isPending) {
+    return <main>Loading...</main>;
+  }
+
+  if (isError) {
+    return <main>Error: {error.message}</main>;
+  }
+
+  return (
+    <ContentWrapper>
+      {notes.map((note) => (
+        <Grid key={note.id} item xs={12}>
+          <NoteCard note={note} onNoteClick={setCurrentNoteId} />
+        </Grid>
+      ))}
+    </ContentWrapper>
   );
 }

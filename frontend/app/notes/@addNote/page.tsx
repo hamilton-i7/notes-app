@@ -30,7 +30,7 @@ const Transition = React.forwardRef(function Transition(
 
 export default function AddNotePage() {
   const { mutate: createNote } = useCreateNote();
-  const { displayAddNote, setDisplayAddNote, setCurrentNote } =
+  const { displayAddNote, setDisplayAddNote, setCurrentNoteId } =
     useContext(NotesContext);
 
   const [title, setTitle] = useState('');
@@ -59,7 +59,7 @@ export default function AddNotePage() {
     createNote(note, {
       onSuccess: (data) => {
         setDisplayAddNote(false);
-        setCurrentNote(data);
+        setCurrentNoteId(data.id);
       },
     });
   };

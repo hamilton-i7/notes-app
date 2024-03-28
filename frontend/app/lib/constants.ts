@@ -1,2 +1,4 @@
 export const NOTES_KEY = 'notes';
-export const ARCHIVED_NOTES_KEY = 'archived notes';
+export const SINGLE_NOTE_KEY = 'note';
+
+export const CATEGORIES_KEY = 'categories';

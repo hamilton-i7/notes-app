@@ -13,6 +13,19 @@ export const getArchivedNotes = async () => {
   return response.data;
 };
 
+export const getNotesByCategories = async (categories: number[]) => {
+  const ids = categories.join(',');
+  const response = await axios.get<{ active: Note[]; archived: Note[] }>(
+    `/notes?categories=${ids}`
+  );
+  return response.data;
+};
+
+export const getNote = async (id: number) => {
+  const response = await axios.get<Note>(`/notes/${id}`);
+  return response.data;
+};
+
 export const createNote = async (note: CreateNoteDto) => {
   const response = await axios.post<Note>('/notes', note);
   return response.data;

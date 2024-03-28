@@ -5,14 +5,16 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  Chip,
   Typography,
 } from '@mui/material';
-import dayjs from 'dayjs';
 import DateText from './DateCreated';
+import { Stack } from '@mui/system';
+import CategoryChips from '@/app/categories/components/CategoryChips';
 
 type NoteCardProps = {
   note: Note;
-  onNoteClick?: (note: Note) => void;
+  onNoteClick?: (id: number) => void;
 };
 
 export default function NoteCard({
@@ -27,7 +29,7 @@ export default function NoteCard({
         borderRadius: (theme) => theme.spacing(3),
       }}
     >
-      <CardActionArea onClick={() => onNoteClick(note)}>
+      <CardActionArea onClick={() => onNoteClick(note.id)}>
         <CardContent>
           <Box
             sx={{
@@ -68,6 +70,8 @@ export default function NoteCard({
           >
             {note.content}
           </Typography>
+
+          <CategoryChips categories={note.categories} />
         </CardContent>
       </CardActionArea>
     </Card>

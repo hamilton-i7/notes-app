@@ -13,15 +13,20 @@ export default function NotesLayout({
   note: React.ReactNode;
   addNote: React.ReactNode;
 }) {
-  const [currentNote, setCurrentNote] = useState<Note | null>(null);
+  const [currentNoteId, setCurrentNoteId] = useState<number | null>(null);
   const [displayAddNote, setDisplayAddNote] = useState(false);
 
   return (
     <NotesContext.Provider
-      value={{ currentNote, setCurrentNote, displayAddNote, setDisplayAddNote }}
+      value={{
+        currentNoteId,
+        setCurrentNoteId,
+        displayAddNote,
+        setDisplayAddNote,
+      }}
     >
       {children}
-      {note}
+      {currentNoteId && note}
       {displayAddNote && addNote}
     </NotesContext.Provider>
   );
