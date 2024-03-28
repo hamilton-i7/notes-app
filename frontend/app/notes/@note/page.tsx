@@ -19,10 +19,11 @@ import BackgroundColorScrollToolbar from '@/app/components/BackgroundColorScroll
 import NoteContent from './components/NoteContent';
 import NoteMenu from './components/NoteMenu';
 import DeleteNoteDialog from './components/DeleteNoteDialog';
-import { useUpdateNote } from '../notes.hook';
+import { useGetNote, useUpdateNote } from '../notes.hook';
 import { UpdateNoteDto } from '../dto/update-note.dto';
 import { useQueryClient } from '@tanstack/react-query';
-import { ARCHIVED_NOTES_KEY, NOTES_KEY } from '@/app/lib/constants';
+import { NOTES_KEY } from '@/app/lib/constants';
+import CategoriesDialog from '@/app/categories/components/CategoriesDialog';
 
 const SNACKBAR_DURATION = 3_000;
 
@@ -36,9 +37,17 @@ const Transition = React.forwardRef(function Transition(
 });
 
 export default function NotePage() {
-  const { currentNote, setCurrentNote } = useContext(NotesContext);
-  const { mutate: updateNote } = useUpdateNote();
+  const { currentNoteId, setCurrentNoteId } = useContext(NotesContext);
+
   const queryClient = useQueryClient();
+
+  const {
+    data: note,
+    isPending,
+    isError,
+    error,
+  } = useGetNote(currentNoteId, !!currentNoteId);
+  const { mutate: updateNote } = useUpdateNote();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -47,6 +56,8 @@ export default function NotePage() {
   const openOptionsMenu = Boolean(anchorEl);
 
   const [openDeleteNoteDialog, setOpenDeleteNoteDialog] = useState(false);
+  const [openCategoriesDialog, setOpenCategoriesDialog] = useState(false);
+
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [useSnackbarAction, setUseSnackbarAction] = useState(false);
@@ -60,7 +71,7 @@ export default function NotePage() {
   };
 
   const handleClose = () => {
-    setCurrentNote(null);
+    setCurrentNoteId(null);
   };
 
   const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -75,26 +86,29 @@ export default function NotePage() {
     setOpenDeleteNoteDialog(false);
   };
 
+  const handleCloseCategoriesDialog = () => {
+    setOpenCategoriesDialog(false);
+  };
+
   const handleCloseSnakbar = () => {
     setShowSnackbar(false);
   };
 
   const handleUpdateNote = () => {
-    const note: UpdateNoteDto = {
+    const noteDto: UpdateNoteDto = {
       title,
       content,
     };
 
     updateNote(
-      { id: currentNote!.id, note },
+      { id: note!.id, note: noteDto },
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({
-            queryKey: currentNote!.archivedAt
-              ? [ARCHIVED_NOTES_KEY]
+            queryKey: note!.archivedAt
+              ? [NOTES_KEY, { archived: true }]
               : [NOTES_KEY],
           });
-          setCurrentNote(data);
           setSnackbarMessage('Note updated 😊');
           setUseSnackbarAction(false);
           setShowSnackbar(true);
@@ -106,22 +120,21 @@ export default function NotePage() {
   const handleArchiveToggle = () => {
     handleCloseOptionsMenu();
 
-    const archivedAt = currentNote!.archivedAt
+    const archivedAt = note!.archivedAt
       ? null
       : new Date(Date.now()).toISOString();
-    const note: UpdateNoteDto = { archivedAt };
+    const noteDto: UpdateNoteDto = { archivedAt };
 
     updateNote(
-      { id: currentNote!.id, note },
+      { id: note!.id, note: noteDto },
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({
             queryKey: [NOTES_KEY],
           });
           queryClient.invalidateQueries({
-            queryKey: [ARCHIVED_NOTES_KEY],
+            queryKey: [NOTES_KEY, { archived: true }],
           });
-          setCurrentNote(data);
           setSnackbarMessage(
             archivedAt ? 'Note archived 😟' : 'Note restored 😃'
           );
@@ -132,6 +145,11 @@ export default function NotePage() {
     );
   };
 
+  const handleCategoriesClick = () => {
+    handleCloseOptionsMenu();
+    setOpenCategoriesDialog(true);
+  };
+
   const handleDeleteClick = () => {
     handleCloseOptionsMenu();
     setOpenDeleteNoteDialog(true);
@@ -140,22 +158,21 @@ export default function NotePage() {
   const handleUndoArchiveToggle = () => {
     handleCloseSnakbar();
 
-    const archivedAt = currentNote!.archivedAt
+    const archivedAt = note!.archivedAt
       ? null
       : new Date(Date.now()).toISOString();
-    const note: UpdateNoteDto = { archivedAt };
+    const noteDto: UpdateNoteDto = { archivedAt };
 
     updateNote(
-      { id: currentNote!.id, note },
+      { id: note!.id, note: noteDto },
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({
             queryKey: [NOTES_KEY],
           });
           queryClient.invalidateQueries({
-            queryKey: [ARCHIVED_NOTES_KEY],
+            queryKey: [NOTES_KEY, { archived: true }],
           });
-          setCurrentNote(data);
         },
       }
     );
@@ -168,18 +185,24 @@ export default function NotePage() {
   );
 
   useEffect(() => {
-    if (!currentNote) return;
-    setTitle(currentNote.title);
-    setContent(currentNote.content);
-  }, [currentNote]);
+    if (!note) return;
+    setTitle(note.title);
+    setContent(note.content);
+  }, [note]);
 
-  if (!currentNote) return null;
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error {error.message}</div>;
+  }
 
   return (
     <>
       <Dialog
         fullScreen
-        open={Boolean(currentNote)}
+        open
         onClose={handleClose}
         TransitionComponent={Transition}
         sx={{
@@ -227,11 +250,12 @@ export default function NotePage() {
                   </IconButton>
                   <NoteMenu
                     anchorEl={anchorEl}
-                    isArchived={Boolean(currentNote.archivedAt)}
+                    isArchived={Boolean(note.archivedAt)}
                     open={openOptionsMenu}
                     onClose={handleCloseOptionsMenu}
                     onArchiveToggleClick={handleArchiveToggle}
                     onDeleteClick={handleDeleteClick}
+                    onCategoriesClick={handleCategoriesClick}
                   />
                 </Stack>
               </Toolbar>
@@ -243,10 +267,14 @@ export default function NotePage() {
           onTitleChange={handleTitleChange}
           content={content}
           onContentChange={handleContentChange}
-          dateCreated={currentNote.createdAt}
-          lastModified={currentNote.lastModified}
+          dateCreated={note.createdAt}
+          lastModified={note.lastModified}
         />
       </Dialog>
+      <CategoriesDialog
+        open={openCategoriesDialog}
+        onClose={handleCloseCategoriesDialog}
+      />
       <DeleteNoteDialog
         open={openDeleteNoteDialog}
         onClose={handleCloseDeleteNoteDialog}

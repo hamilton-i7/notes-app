@@ -62,7 +62,7 @@ export default function Notes() {
     categoryParams.map((categoryId) => +categoryId),
     categoryParams.length > 0
   );
-  const { setCurrentNote, setDisplayAddNote } = useContext(NotesContext);
+  const { setCurrentNoteId } = useContext(NotesContext);
 
   if (searchParams.has('categories')) {
     if (isFilterPending) {
@@ -77,7 +77,7 @@ export default function Notes() {
       <ContentWrapper>
         {filteredNotes.active.map((note) => (
           <Grid key={note.id} item xs={12}>
-            <NoteCard note={note} onNoteClick={setCurrentNote} />
+            <NoteCard note={note} onNoteClick={setCurrentNoteId} />
           </Grid>
         ))}
         {filteredNotes.archived.length > 0 && (
@@ -93,7 +93,7 @@ export default function Notes() {
             </Typography>
             {filteredNotes.archived.map((note) => (
               <Grid key={note.id} item xs={12}>
-                <NoteCard note={note} onNoteClick={setCurrentNote} />
+                <NoteCard note={note} onNoteClick={setCurrentNoteId} />
               </Grid>
             ))}
           </>
@@ -114,7 +114,7 @@ export default function Notes() {
     <ContentWrapper>
       {notes.map((note) => (
         <Grid key={note.id} item xs={12}>
-          <NoteCard note={note} onNoteClick={setCurrentNote} />
+          <NoteCard note={note} onNoteClick={setCurrentNoteId} />
         </Grid>
       ))}
     </ContentWrapper>

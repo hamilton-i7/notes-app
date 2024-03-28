@@ -11,12 +11,14 @@ type NoteMenuProps = MenuProps & {
   isArchived: boolean;
   onArchiveToggleClick?: () => void;
   onDeleteClick?: () => void;
+  onCategoriesClick?: () => void;
 };
 
 export default function NoteMenu({
   isArchived,
   onArchiveToggleClick = () => {},
   onDeleteClick = () => {},
+  onCategoriesClick = () => {},
   anchorEl,
   open,
   onClose,
@@ -39,6 +41,16 @@ export default function NoteMenu({
       }}
       {...props}
     >
+      <MenuItem onClick={onCategoriesClick}>
+        <ListItemText
+          disableTypography
+          sx={{
+            typography: 'body-l',
+          }}
+        >
+          Categories
+        </ListItemText>
+      </MenuItem>
       <MenuItem onClick={onArchiveToggleClick} disableGutters>
         <ListItemButton>
           <ListItemText disableTypography sx={{ typography: 'body-l' }}>

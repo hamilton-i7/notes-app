@@ -7,12 +7,11 @@ import {
   CardContent,
   Typography,
 } from '@mui/material';
-import dayjs from 'dayjs';
 import DateText from './DateCreated';
 
 type NoteCardProps = {
   note: Note;
-  onNoteClick?: (note: Note) => void;
+  onNoteClick?: (id: number) => void;
 };
 
 export default function NoteCard({
@@ -27,7 +26,7 @@ export default function NoteCard({
         borderRadius: (theme) => theme.spacing(3),
       }}
     >
-      <CardActionArea onClick={() => onNoteClick(note)}>
+      <CardActionArea onClick={() => onNoteClick(note.id)}>
         <CardContent>
           <Box
             sx={{

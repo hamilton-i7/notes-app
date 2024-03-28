@@ -19,14 +19,14 @@ export default function DeleteNoteDialog({
   open,
   onClose,
 }: DeleteNoteDialogProps) {
-  const { currentNote, setCurrentNote } = useContext(NotesContext);
+  const { currentNoteId, setCurrentNoteId } = useContext(NotesContext);
   const { mutate: deleteNote } = useDeleteNote();
 
   const handleDeleteNote = () => {
-    deleteNote(currentNote!.id, {
+    deleteNote(currentNoteId!, {
       onSuccess: () => {
         onClose();
-        setCurrentNote(null);
+        setCurrentNoteId(null);
       },
     });
   };
