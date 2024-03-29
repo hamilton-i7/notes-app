@@ -40,7 +40,6 @@ export default function NoteContent({
       <Stack flex="1" sx={{ overflowY: 'scroll' }}>
         <TextField
           variant="outlined"
-          multiline
           fullWidth
           placeholder="Title"
           value={title}
