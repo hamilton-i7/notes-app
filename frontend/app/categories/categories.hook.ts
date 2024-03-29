@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CATEGORIES_KEY, SINGLE_CATEGORY_KEY } from '../lib/constants';
+import {
+  CATEGORIES_KEY,
+  NOTES_KEY,
+  SINGLE_CATEGORY_KEY,
+} from '../lib/constants';
 import {
   createCategory,
   deleteCategory,
@@ -53,6 +57,7 @@ export const useUpdateCategory = () => {
     onSuccess: (data) => {
       queryClient.setQueryData([SINGLE_CATEGORY_KEY, { id: data.id }], data);
       queryClient.invalidateQueries({ queryKey: [CATEGORIES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [NOTES_KEY] });
     },
     onError: (error) => {
       console.log(error);
