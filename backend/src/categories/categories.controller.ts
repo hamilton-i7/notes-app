@@ -32,6 +32,15 @@ export class CategoriesController {
     return this.categoriesService.findAll();
   }
 
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Category> {
+    const category = await this.categoriesService.findOne(id);
+    if (!category) {
+      throw new NotFoundException(CATEGORY_NOT_FOUND_ERROR);
+    }
+    return category;
+  }
+
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,

@@ -12,10 +12,9 @@ import {
   Stack,
   Snackbar,
   Box,
-  Typography,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { Close, Description, MoreVert } from '@mui/icons-material';
+import { Close, MoreVert } from '@mui/icons-material';
 import ElevationScrollAppBar from '@/app/components/ElevationScrollAppBar';
 import BackgroundColorScrollToolbar from '@/app/components/BackgroundColorScrollToolbar';
 import NoteContent from './components/NoteContent';

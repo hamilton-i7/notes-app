@@ -5,3 +5,5 @@ export const NOTE_NOT_FOUND_ERROR = 'Note not found.';
 export const EMPTY_NOTE_ERROR =
   'Note cannot be empty. Either set a Title or a Content.';
 export const NOTE_DELETED = 'Note deleted successfully.';
+
+export const CATEGORY_NOT_FOUND_ERROR = 'Category not found.';
