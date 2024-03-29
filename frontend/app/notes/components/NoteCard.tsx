@@ -72,6 +72,7 @@ export default function NoteCard({
               WebkitLineClamp: '2',
               WebkitBoxOrient: 'vertical',
               color: (theme) => theme.palette.outline,
+              whiteSpace: 'pre-wrap',
             }}
           >
             {note.content}
