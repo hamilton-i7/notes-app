@@ -31,7 +31,15 @@ export class CategoriesService {
     return this.categoriesRepository.update(id, updateCategoryDto);
   }
 
-  remove(id: number): Promise<DeleteResult> {
+  async remove(id: number): Promise<DeleteResult> {
+    const category = await this.categoriesRepository.findOne({
+      relations: { notes: true },
+      where: { id },
+    });
+    if (category.notes) {
+      category.notes = [];
+      await this.categoriesRepository.save(category);
+    }
     return this.categoriesRepository.delete(id);
   }
 }

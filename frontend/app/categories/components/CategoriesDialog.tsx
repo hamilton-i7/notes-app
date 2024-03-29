@@ -8,6 +8,9 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
+  Skeleton,
+  Typography,
+  DialogContentText,
 } from '@mui/material';
 import { useGetCategories } from '../categories.hook';
 import { NotesContext } from '@/app/notes/NotesContext';
@@ -26,7 +29,7 @@ export default function CategoriesDialog({
   open,
   onClose = () => {},
 }: CategoriesDialogProps) {
-  const { currentNoteId, setCurrentNoteId } = useContext(NotesContext);
+  const { currentNoteId } = useContext(NotesContext);
 
   const {
     data: categories,
@@ -58,12 +61,10 @@ export default function CategoriesDialog({
         .map((id) => +id),
     };
 
-    console.log(noteDto.categories);
-
     updateNote(
       { id: note!.id, note: noteDto },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: [NOTES_KEY],
           });
@@ -76,36 +77,41 @@ export default function CategoriesDialog({
     );
   };
 
-  useEffect(() => {
-    if (!categories || !note) return;
-    setSelectedCategories(
-      note.categories.reduce(
-        (acc, curr) => ({
-          ...acc,
-          [curr.id]: curr,
-        }),
-        {}
-      )
-    );
-  }, [categories, note]);
+  const emptyContent = (
+    <>
+      <DialogTitle>No categories yet!</DialogTitle>
+      <DialogContent>
+        <DialogContentText
+          variant="body-l"
+          sx={{ color: (theme) => theme.palette.outline }}
+        >
+          Oops! It looks like there are no categories available. Why not create
+          a category to get started?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          autoFocus
+          onClick={onClose}
+          sx={{ typography: 'body-l', textTransform: 'capitalize' }}
+        >
+          Ok
+        </Button>
+      </DialogActions>
+    </>
+  );
 
-  return (
-    <Dialog
-      sx={{
-        '& .MuiDialog-paper': {
-          width: '80%',
-          maxHeight: 435,
-          borderRadius: (theme) => theme.spacing(6),
-        },
-      }}
-      maxWidth="xs"
-      open={open}
-      onClose={onClose}
-    >
+  const content = (
+    <>
       <DialogTitle>Categories</DialogTitle>
       <DialogContent dividers>
         <FormGroup>
-          {isPending && <div>Categories loading...</div>}
+          {isPending &&
+            Array.from(Array(5)).map((_, i) => (
+              <Typography key={i} variant="heading-xl">
+                <Skeleton />
+              </Typography>
+            ))}
           {isError && <div>Error {error.message}</div>}
           {isSuccess &&
             categories.map((category) => (
@@ -137,6 +143,36 @@ export default function CategoriesDialog({
           Save
         </Button>
       </DialogActions>
+    </>
+  );
+
+  useEffect(() => {
+    if (!categories || !note) return;
+    setSelectedCategories(
+      note.categories.reduce(
+        (acc, curr) => ({
+          ...acc,
+          [curr.id]: curr,
+        }),
+        {}
+      )
+    );
+  }, [categories, note]);
+
+  return (
+    <Dialog
+      sx={{
+        '& .MuiDialog-paper': {
+          width: '80%',
+          maxHeight: 435,
+          borderRadius: (theme) => theme.spacing(6),
+        },
+      }}
+      maxWidth="xs"
+      open={open}
+      onClose={onClose}
+    >
+      {categories && categories.length ? content : emptyContent}
     </Dialog>
   );
 }

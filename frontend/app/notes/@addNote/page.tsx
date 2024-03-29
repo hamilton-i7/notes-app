@@ -10,6 +10,7 @@ import {
   IconButton,
   Slide,
   Button,
+  Box,
 } from '@mui/material';
 import { title } from 'process';
 import React, { useContext, useState } from 'react';
@@ -66,18 +67,8 @@ export default function AddNotePage() {
 
   if (!displayAddNote) return null;
 
-  return (
-    <Dialog
-      fullScreen
-      open
-      onClose={handleClose}
-      TransitionComponent={Transition}
-      sx={{
-        '& .MuiPaper-root': {
-          bgcolor: (theme) => theme.palette.background.surface,
-        },
-      }}
-    >
+  const pageContent = (
+    <>
       <ElevationScrollAppBar>
         <AppBar
           sx={{
@@ -115,6 +106,36 @@ export default function AddNotePage() {
         content={content}
         onContentChange={handleContentChange}
       />
-    </Dialog>
+    </>
+  );
+
+  return (
+    <>
+      <Dialog
+        fullScreen
+        open
+        onClose={handleClose}
+        TransitionComponent={Transition}
+        sx={{
+          display: { xs: 'block', lg: 'none' },
+          '& .MuiPaper-root': {
+            bgcolor: (theme) => theme.palette.background.surface,
+          },
+        }}
+      >
+        {pageContent}
+      </Dialog>
+      <Box
+        sx={{
+          display: { xs: 'none', lg: 'flex' },
+          flexDirection: { lg: 'column' },
+          flex: { lg: 2 },
+          borderLeft: (theme) =>
+            `${theme.spacing(0.25)} solid ${theme.palette.outline}`,
+        }}
+      >
+        {pageContent}
+      </Box>
+    </>
   );
 }
