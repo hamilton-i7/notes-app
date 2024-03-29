@@ -66,7 +66,7 @@ export default function CategoriesDialog({
     updateNote(
       { id: note!.id, note: noteDto },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: [NOTES_KEY],
           });

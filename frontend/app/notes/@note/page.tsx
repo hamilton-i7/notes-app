@@ -122,7 +122,7 @@ export default function NotePage() {
     updateNote(
       { id: note!.id, note: noteDto },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: note!.archivedAt
               ? [NOTES_KEY, { archived: true }]
@@ -260,6 +260,12 @@ export default function NotePage() {
     setTitle(note.title);
     setContent(note.content);
   }, [note]);
+
+  useEffect(() => {
+    if (!currentNoteId && showSnackbar) {
+      setShowSnackbar(false);
+    }
+  }, [currentNoteId, showSnackbar]);
 
   if (!currentNoteId) {
     return <EmptyState />;
