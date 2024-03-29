@@ -239,7 +239,12 @@ export default function Notes() {
 function EmptyState() {
   return (
     <Box sx={{ alignSelf: 'center', pt: (theme) => theme.spacing(8) }}>
-      <Image src={Sunlight} alt="Womant staring at the sun" width={200} />
+      <Image
+        src={Sunlight}
+        alt="Womant staring at the sun"
+        width={200}
+        priority
+      />
     </Box>
   );
 }

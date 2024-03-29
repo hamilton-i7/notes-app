@@ -21,7 +21,7 @@ export default function EditCategoryDialog({
   open,
   onClose = () => {},
 }: EditCategoryDialogProps) {
-  const { data: category } = useGetCategory(id);
+  const { data: category } = useGetCategory(id, Boolean(id));
   const { mutate: updateCategory } = useUpdateCategory();
   const [name, setName] = useState('');
 

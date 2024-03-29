@@ -17,10 +17,11 @@ export const useGetCategories = () => {
   });
 };
 
-export const useGetCategory = (id: number) => {
+export const useGetCategory = (id: number | undefined, enabled = false) => {
   return useQuery({
     queryKey: [SINGLE_CATEGORY_KEY, { id }],
-    queryFn: () => getCategory(id),
+    queryFn: () => getCategory(id!),
+    enabled,
   });
 };
 
