@@ -72,6 +72,10 @@ export const useDeleteCategory = () => {
     mutationFn: (id: number) => deleteCategory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [CATEGORIES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [NOTES_KEY] });
+      queryClient.invalidateQueries({
+        queryKey: [NOTES_KEY, { archived: true }],
+      });
     },
   });
 };

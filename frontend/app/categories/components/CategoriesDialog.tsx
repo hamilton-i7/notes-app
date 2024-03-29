@@ -61,8 +61,6 @@ export default function CategoriesDialog({
         .map((id) => +id),
     };
 
-    console.log(noteDto.categories);
-
     updateNote(
       { id: note!.id, note: noteDto },
       {

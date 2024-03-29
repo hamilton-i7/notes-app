@@ -68,6 +68,10 @@ export const useUpdateNote = () => {
       updateNote(id, note),
     onSuccess: (data) => {
       queryClient.setQueryData([SINGLE_NOTE_KEY, { id: data.id }], data);
+      queryClient.invalidateQueries({ queryKey: [NOTES_KEY] });
+      queryClient.invalidateQueries({
+        queryKey: [NOTES_KEY, { archived: true }],
+      });
     },
     onError: (error) => {
       console.log(error);

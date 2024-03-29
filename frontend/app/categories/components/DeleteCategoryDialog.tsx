@@ -62,8 +62,8 @@ export default function DeleteCategoryDialog({
           variant="body-l"
           sx={{ color: (theme) => theme.palette.outline }}
         >
-          Are you sure you want to delete this category? This action cannot be
-          reversed.
+          Are you sure you want to delete this category? The category will be
+          removed from all notes related to it.
         </DialogContentText>
       </DialogContent>
       <DialogActions
