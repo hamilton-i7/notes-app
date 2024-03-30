@@ -7,10 +7,12 @@ import {
   getNote,
   getNotes,
   getNotesByCategories,
+  reorderNotes,
   updateNote,
 } from './notes.api';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { ReorderNotesDto } from './dto/reorder-notes.dto';
 
 export const useGetNotes = (enabled = true) => {
   return useQuery({
@@ -89,6 +91,20 @@ export const useDeleteNote = () => {
       queryClient.invalidateQueries({
         queryKey: [NOTES_KEY, { archived: true }],
       });
+    },
+  });
+};
+
+export const useReorderNotes = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dto: ReorderNotesDto) => reorderNotes(dto),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [NOTES_KEY] });
+    },
+    onError: (error) => {
+      console.log(error);
     },
   });
 };

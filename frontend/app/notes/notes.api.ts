@@ -1,5 +1,6 @@
 import axios from '../lib/axiosInstance';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { ReorderNotesDto } from './dto/reorder-notes.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { Note } from './models/note.model';
 
@@ -38,5 +39,10 @@ export const updateNote = async (id: number, note: UpdateNoteDto) => {
 
 export const deleteNote = async (id: number) => {
   const response = await axios.delete<string>(`notes/${id}`);
+  return response.data;
+};
+
+export const reorderNotes = async (dto: ReorderNotesDto) => {
+  const response = await axios.patch<Note[]>('notes/reorder', dto);
   return response.data;
 };
