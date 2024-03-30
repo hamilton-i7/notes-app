@@ -25,18 +25,6 @@ install_dependencies() {
   cd ..
 }
 
-setup_database() {  
-  cd backend || die "Error: backend directory not found."
-  if ! command_exists mysql; then
-    die "Error: mysql is not installed. Please install it globally before running this script."
-  fi
-
-  echo "Setting up database schema..."
-  mysql -u root -proot -h localhost -e "DROP DATABASE IF EXISTS notes_app;"
-  mysql -u root -proot -h localhost -e "CREATE DATABASE notes_app;"
-  cd ..
-}
-
 start_app() {
   echo "Starting backend server..."
   cd backend || die "Error: backend directory not found."
@@ -48,5 +36,4 @@ start_app() {
 }
 
 install_dependencies
-setup_database
 start_app
