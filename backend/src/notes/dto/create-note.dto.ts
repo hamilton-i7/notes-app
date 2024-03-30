@@ -1,11 +1,4 @@
-import {
-  IsBoolean,
-  IsDefined,
-  IsNumber,
-  IsString,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsDefined, IsNumber, IsString, MaxLength, Min } from 'class-validator';
 import {
   EMPTY_NOTE_ERROR,
   NOTE_CONTENT_MAX_LENGTH,

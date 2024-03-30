@@ -21,6 +21,9 @@ export class Note {
   @Column({ type: 'mediumtext' })
   content: string;
 
+  @Column()
+  position: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -30,7 +33,7 @@ export class Note {
   @Column({ type: 'timestamp', nullable: true, default: null })
   archivedAt: Date | null;
 
-  @ManyToMany((type) => Category, (category) => category.notes, {
+  @ManyToMany(() => Category, (category) => category.notes, {
     cascade: true,
   })
   @JoinTable()
