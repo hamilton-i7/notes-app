@@ -17,6 +17,7 @@ export function generateSampleNotes(notesToGenerate: number): Note[] {
       lastModified: now,
       archivedAt: i % 3 === 0 ? archivedDate : null,
       categories: [],
+      position: -1,
     };
     notes.push(note);
   }
