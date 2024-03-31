@@ -13,10 +13,20 @@ export class NotesService {
     @InjectRepository(Note) private notesRepository: Repository<Note>,
   ) {}
 
-  create(createNoteDto: CreateNoteDto): Promise<Note> {
+  async create(createNoteDto: CreateNoteDto): Promise<Note> {
     const { categories } = createNoteDto;
+    const notes = await this.notesRepository.find({
+      where: { archivedAt: IsNull() },
+      order: { position: 'ASC' },
+      select: { id: true },
+    });
+    notes.forEach((note, i) => {
+      note.position = i + 1;
+    });
+    await this.notesRepository.save(notes);
     return this.notesRepository.save({
       ...createNoteDto,
+      position: 0,
       categories: categories.map((id) => ({ id }) as Category),
     });
   }
@@ -79,13 +89,27 @@ export class NotesService {
     const exists = await this.notesRepository.existsBy({ id });
     if (!exists) return null;
 
-    const { categories } = updateNoteDto;
+    const { categories, archivedAt } = updateNoteDto;
+    // Only rearrange all active notes when restoring a note from archives
+    if (archivedAt === null) {
+      const notes = await this.notesRepository.find({
+        where: { archivedAt: IsNull() },
+        order: { position: 'ASC' },
+        select: { id: true },
+      });
+      notes.forEach((note, i) => {
+        note.position = i + 1;
+      });
+      await this.notesRepository.save(notes);
+    }
+
     return this.notesRepository.save({
       ...updateNoteDto,
       id,
       categories: categories
         ? categories.map((id) => ({ id }) as Category)
         : undefined,
+      position: archivedAt === null ? 0 : undefined,
     });
   }
 

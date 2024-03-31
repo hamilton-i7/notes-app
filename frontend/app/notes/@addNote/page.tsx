@@ -12,7 +12,6 @@ import {
   Button,
   Box,
 } from '@mui/material';
-import { title } from 'process';
 import React, { useContext, useState } from 'react';
 import NoteContent from '../@note/components/NoteContent';
 import { NotesContext } from '../NotesContext';

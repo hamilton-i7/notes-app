@@ -8,7 +8,7 @@ die() {
 start_app() {
   echo "Starting backend server..."
   cd backend || die "Error: backend directory not found."
-  npm run start &
+  npm run start:dev &
 
   echo "Starting frontend server..."
   cd ../frontend || die "Error: frontend directory not found."
