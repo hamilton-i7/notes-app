@@ -41,7 +41,7 @@ export default function ArchivedNotes() {
       sx={{
         p: (theme) => theme.spacing(4),
         bgcolor: (theme) => theme.palette.background.main,
-        flex: { lg: 1 },
+        flex: (theme) => ({ lg: `1 ${theme.spacing(20)}` }),
         overflowY: { lg: 'scroll' },
         justifyContent: notes.length === 0 ? 'center' : 'flex-start',
       }}

@@ -256,7 +256,7 @@ export default function Notes() {
         component="main"
         sx={{
           bgcolor: (theme) => theme.palette.background.main,
-          flex: { lg: 1 },
+          flex: (theme) => ({ lg: `1 ${theme.spacing(20)}` }),
           overflowY: { lg: 'scroll' },
           width: { xs: '100%', lg: 'auto' },
         }}
