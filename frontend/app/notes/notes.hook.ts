@@ -30,12 +30,12 @@ export const useGetArchivedNotes = () => {
 };
 
 export const useGetNotesByCategories = (
-  categories: number[],
+  category: number,
   enabled: boolean = false
 ) => {
   return useQuery({
-    queryKey: [NOTES_KEY, { categories }],
-    queryFn: () => getNotesByCategories(categories),
+    queryKey: [NOTES_KEY, { category }],
+    queryFn: () => getNotesByCategories(category),
     enabled,
   });
 };

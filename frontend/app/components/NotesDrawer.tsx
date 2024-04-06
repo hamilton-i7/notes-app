@@ -16,6 +16,7 @@ import {
   Archive,
   Home,
   LabelOutlined,
+  MoreVert,
   TipsAndUpdates,
 } from '@mui/icons-material';
 import DrawerItem from './DrawerItem';
@@ -26,6 +27,9 @@ import BackgroundColorScrollToolbar from './BackgroundColorScrollToolbar';
 import { useGetCategories } from '../categories/categories.hook';
 import DrawerItemSkeleton from './DrawerItemSkeleton';
 import CreateCategoryDialog from '../categories/components/CreateCategoryDialog';
+import CategoryMenu from '../categories/components/CategoryMenu';
+import EditCategoryDialog from '../categories/components/EditCategoryDialog';
+import DeleteCategoryDialog from '../categories/components/DeleteCategoryDialog';
 
 const drawerWidth = 280;
 
@@ -36,6 +40,7 @@ interface NotesDrawerProps {
 export default function NotesDrawer({ children }: NotesDrawerProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isCategoryScreen = searchParams.has('categories');
 
   const [currentURL, setCurrentURL] = useState('');
 
@@ -63,6 +68,13 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
   const [showCreateCategoryDialog, setShowCreateCategoryDialog] =
     useState(false);
 
+  const [showEditCategoryDialog, setShowEditCategoryDialog] = useState(false);
+  const [showDeleteCategoryDialog, setShowDeleteCategoryDialog] =
+    useState(false);
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const openOptionsMenu = Boolean(anchorEl);
+
   const handleDrawerClose = () => {
     setMobileOpen(false);
   };
@@ -80,8 +92,34 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
     setShowCreateCategoryDialog(false);
   };
 
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseOptionsMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEditCategoryClick = () => {
+    handleCloseOptionsMenu();
+    setShowEditCategoryDialog(true);
+  };
+
+  const handleEditCategoryClose = () => {
+    setShowEditCategoryDialog(false);
+  };
+
+  const handleDeleteCategoryClick = () => {
+    handleCloseOptionsMenu();
+    setShowDeleteCategoryDialog(true);
+  };
+
+  const handleDeleteCategoryClose = () => {
+    setShowDeleteCategoryDialog(false);
+  };
+
   useEffect(() => {
-    if (searchParams.has('categories') && categories) {
+    if (isCategoryScreen && categories) {
       const categoryId = searchParams.get('categories')!;
       setCurrentPageTitle(
         categories.find(({ id }) => id === +categoryId)?.name ?? ''
@@ -96,7 +134,7 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       case '/notes/archive':
         setCurrentPageTitle('Archive');
     }
-  }, [pathname, searchParams, categories]);
+  }, [pathname, searchParams, categories, isCategoryScreen]);
 
   useEffect(() => {
     if (!categories) return;
@@ -112,13 +150,13 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
   }, [categories]);
 
   useEffect(() => {
-    if (searchParams.has('categories')) {
+    if (isCategoryScreen) {
       const categoryId = searchParams.get('categories')!;
       setCurrentURL(`${pathname}?categories=${categoryId}`);
       return;
     }
     setCurrentURL(pathname);
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, isCategoryScreen]);
 
   useEffect(() => {
     if (!isBeyondSmallScreen) return;
@@ -183,7 +221,7 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
         sx={{
           typography: 'body-l',
           textTransform: 'capitalize',
-          m: (theme) => theme.spacing(2, 2, 0),
+          m: (theme) => theme.spacing(0, 2, 4),
         }}
       >
         Create new category
@@ -223,9 +261,29 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
                   noWrap
                   component="h1"
                   color="inherit"
+                  sx={{ flex: 1 }}
                 >
                   {currentPageTitle}
                 </Typography>
+                {isCategoryScreen && (
+                  <>
+                    <IconButton
+                      color="inherit"
+                      onClick={handleOptionsClick}
+                      aria-label="show category options menu"
+                      sx={{ mx: (theme) => theme.spacing(2) }}
+                    >
+                      <MoreVert />
+                    </IconButton>
+                    <CategoryMenu
+                      anchorEl={anchorEl}
+                      open={openOptionsMenu}
+                      onClose={handleCloseOptionsMenu}
+                      onEditClick={handleEditCategoryClick}
+                      onDeleteClick={handleDeleteCategoryClick}
+                    />
+                  </>
+                )}
               </Toolbar>
             </BackgroundColorScrollToolbar>
           </AppBar>
@@ -284,6 +342,16 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       <CreateCategoryDialog
         open={showCreateCategoryDialog}
         onClose={handleCreateCategoryClose}
+      />
+      <EditCategoryDialog
+        id={+searchParams.get('categories')!}
+        open={showEditCategoryDialog}
+        onClose={handleEditCategoryClose}
+      />
+      <DeleteCategoryDialog
+        id={+searchParams.get('categories')!}
+        open={showDeleteCategoryDialog}
+        onClose={handleDeleteCategoryClose}
       />
     </>
   );
