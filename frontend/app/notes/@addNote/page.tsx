@@ -128,7 +128,7 @@ export default function AddNotePage() {
         sx={{
           display: { xs: 'none', lg: 'flex' },
           flexDirection: { lg: 'column' },
-          flex: { lg: 2 },
+          flex: { lg: 1 },
           borderLeft: (theme) =>
             `${theme.spacing(0.25)} solid ${theme.palette.outline}`,
         }}

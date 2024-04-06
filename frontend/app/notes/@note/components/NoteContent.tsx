@@ -46,6 +46,7 @@ export default function NoteContent({
           onChange={(event) => onTitleChange(event.target.value)}
           sx={{
             '& .MuiInputBase-root': { p: 0 },
+            '& .MuiInputBase-input': { p: 0 },
             '.MuiInputBase-input': { typography: 'heading-xl' },
             '& .MuiOutlinedInput-notchedOutline': {
               border: 'none',

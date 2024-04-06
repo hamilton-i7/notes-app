@@ -256,9 +256,8 @@ export default function Notes() {
         component="main"
         sx={{
           bgcolor: (theme) => theme.palette.background.main,
-          flex: (theme) => ({ lg: `1 ${theme.spacing(20)}` }),
           overflowY: { lg: 'scroll' },
-          width: { xs: '100%', lg: 'auto' },
+          width: (theme) => ({ xs: '100%', lg: theme.spacing(100) }),
         }}
       >
         {isCategoryScreen && matches && (
