@@ -3,7 +3,6 @@ import {
   ValidationOptions,
   registerDecorator,
 } from 'class-validator';
-import { CreateNoteDto } from '../dto/create-note.dto';
 
 export function OnlyOneEmpty(
   property: string,

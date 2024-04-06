@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from './entities/note.entity';
 import { DeleteResult, In, IsNull, Not, Repository } from 'typeorm';
 import { Category } from 'src/categories/entities/category.entity';
+import { ReorderNotesDto } from './dto/reorder-notes.dto';
 
 @Injectable()
 export class NotesService {
@@ -12,10 +13,20 @@ export class NotesService {
     @InjectRepository(Note) private notesRepository: Repository<Note>,
   ) {}
 
-  create(createNoteDto: CreateNoteDto): Promise<Note> {
+  async create(createNoteDto: CreateNoteDto): Promise<Note> {
     const { categories } = createNoteDto;
+    const notes = await this.notesRepository.find({
+      where: { archivedAt: IsNull() },
+      order: { position: 'ASC' },
+      select: { id: true },
+    });
+    notes.forEach((note, i) => {
+      note.position = i + 1;
+    });
+    await this.notesRepository.save(notes);
     return this.notesRepository.save({
       ...createNoteDto,
+      position: 0,
       categories: categories.map((id) => ({ id }) as Category),
     });
   }
@@ -24,7 +35,7 @@ export class NotesService {
     return this.notesRepository.find({
       relations: { categories: true },
       where: { archivedAt: IsNull() },
-      order: { createdAt: 'DESC', categories: { name: 'ASC' } },
+      order: { position: 'ASC', categories: { name: 'ASC' } },
       select: { categories: { id: true, name: true } },
     });
   }
@@ -49,7 +60,7 @@ export class NotesService {
           id: In(categories),
         },
       },
-      order: { createdAt: 'DESC', categories: { name: 'ASC' } },
+      order: { position: 'ASC', categories: { name: 'ASC' } },
     });
 
     const archivedNotes = await this.notesRepository.find({
@@ -78,17 +89,50 @@ export class NotesService {
     const exists = await this.notesRepository.existsBy({ id });
     if (!exists) return null;
 
-    const { categories } = updateNoteDto;
+    const { categories, archivedAt } = updateNoteDto;
+    // Only rearrange all active notes when restoring a note from archives
+    if (archivedAt === null) {
+      const notes = await this.notesRepository.find({
+        where: { archivedAt: IsNull() },
+        order: { position: 'ASC' },
+        select: { id: true },
+      });
+      notes.forEach((note, i) => {
+        note.position = i + 1;
+      });
+      await this.notesRepository.save(notes);
+    }
+
     return this.notesRepository.save({
       ...updateNoteDto,
       id,
       categories: categories
         ? categories.map((id) => ({ id }) as Category)
         : undefined,
+      position: archivedAt === null ? 0 : undefined,
     });
   }
 
   remove(id: number): Promise<DeleteResult> {
     return this.notesRepository.delete(id);
+  }
+
+  async reorder({ notes: noteIds }: ReorderNotesDto): Promise<Note[]> {
+    const notes = await this.notesRepository.find({
+      where: { archivedAt: IsNull() },
+      select: { id: true, position: true },
+    });
+    const notesMap: Record<number, Note> = notes.reduce(
+      (acc, note) => ({ ...acc, [note.id]: note }),
+      {} as Record<number, Note>,
+    );
+    const notesToUpdate: Note[] = [];
+
+    noteIds.forEach((id, i) => {
+      const note = notesMap[id];
+      if (!note) return;
+      notesToUpdate.push({ ...note, position: i });
+    });
+    return this.notesRepository.save(notesToUpdate);
   }
 }

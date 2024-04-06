@@ -16,6 +16,7 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { Note } from './entities/note.entity';
 import { NOTE_DELETED, NOTE_NOT_FOUND_ERROR } from './utilities/constants';
+import { ReorderNotesDto } from './dto/reorder-notes.dto';
 
 @Controller('notes')
 export class NotesController {
@@ -50,6 +51,11 @@ export class NotesController {
       throw new NotFoundException(NOTE_NOT_FOUND_ERROR);
     }
     return note;
+  }
+
+  @Patch('/reorder')
+  reorder(@Body() reorderNotesDto: ReorderNotesDto) {
+    return this.notesService.reorder(reorderNotesDto);
   }
 
   @Patch(':id')
