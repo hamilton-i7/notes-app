@@ -27,6 +27,8 @@ import { NOTES_KEY } from '@/app/lib/constants';
 import CategoriesDialog from '@/app/categories/components/CategoriesDialog';
 import EmptyState from './components/EmptyState';
 import NoteContentSkeleton from './components/NoteContentSkeleton';
+import { Category } from '@/app/categories/models/category.model';
+import { useGetCategories } from '@/app/categories/categories.hook';
 
 const SNACKBAR_DURATION = 3_000;
 
@@ -45,7 +47,7 @@ function PermanentContentWrapper({ children }: { children: React.ReactNode }) {
       sx={{
         display: { xs: 'none', lg: 'flex' },
         flexDirection: { lg: 'column' },
-        flex: { lg: 2 },
+        flex: { lg: 1 },
         borderLeft: (theme) =>
           `${theme.spacing(0.25)} solid ${theme.palette.outline}`,
       }}
@@ -66,10 +68,12 @@ export default function NotePage() {
     isError,
     error,
   } = useGetNote(currentNoteId, !!currentNoteId);
+  const { data: categories } = useGetCategories();
   const { mutate: updateNote } = useUpdateNote();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [noteCategories, setNoteCategories] = useState<Category[]>([]);
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const openOptionsMenu = Boolean(anchorEl);
@@ -262,6 +266,16 @@ export default function NotePage() {
   }, [note]);
 
   useEffect(() => {
+    if (!categories || !note) return;
+
+    const noteCategoryIds: { [id: number]: Category } = note.categories.reduce(
+      (acc, curr) => ({ ...acc, [curr.id]: curr }),
+      {}
+    );
+    setNoteCategories(categories.filter(({ id }) => noteCategoryIds[id]));
+  }, [categories, note]);
+
+  useEffect(() => {
     if (!currentNoteId && showSnackbar) {
       setShowSnackbar(false);
     }
@@ -292,7 +306,7 @@ export default function NotePage() {
       onContentChange={handleContentChange}
       dateCreated={note.createdAt}
       lastModified={note.lastModified}
-      categories={note.categories}
+      categories={noteCategories}
     />
   );
 

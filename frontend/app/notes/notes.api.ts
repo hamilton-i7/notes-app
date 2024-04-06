@@ -1,5 +1,6 @@
 import axios from '../lib/axiosInstance';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { ReorderNotesDto } from './dto/reorder-notes.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { Note } from './models/note.model';
 
@@ -13,10 +14,9 @@ export const getArchivedNotes = async () => {
   return response.data;
 };
 
-export const getNotesByCategories = async (categories: number[]) => {
-  const ids = categories.join(',');
+export const getNotesByCategories = async (category: number) => {
   const response = await axios.get<{ active: Note[]; archived: Note[] }>(
-    `/notes?categories=${ids}`
+    `/notes?categories=${category}`
   );
   return response.data;
 };
@@ -38,5 +38,10 @@ export const updateNote = async (id: number, note: UpdateNoteDto) => {
 
 export const deleteNote = async (id: number) => {
   const response = await axios.delete<string>(`notes/${id}`);
+  return response.data;
+};
+
+export const reorderNotes = async (dto: ReorderNotesDto) => {
+  const response = await axios.patch<Note[]>('notes/reorder', dto);
   return response.data;
 };
