@@ -11,6 +11,8 @@ import { ReorderNotesDto } from './dto/reorder-notes.dto';
 export class NotesService {
   constructor(
     @InjectRepository(Note) private notesRepository: Repository<Note>,
+    @InjectRepository(Category)
+    private categoriesRepository: Repository<Category>,
   ) {}
 
   async create(createNoteDto: CreateNoteDto): Promise<Note> {
@@ -50,26 +52,29 @@ export class NotesService {
   }
 
   async findByCategories(
-    categories: number[],
+    categoryIds: number[],
   ): Promise<{ active: Note[]; archived: Note[] }> {
+    const categories = await this.categoriesRepository.find({
+      relations: { notes: true },
+      where: { id: In(categoryIds) },
+      select: { notes: { id: true } },
+    });
+    const noteIds = categories
+      .flatMap(({ notes }) => notes)
+      .map(({ id }) => id);
     const activeNotes = await this.notesRepository.find({
       relations: { categories: true },
       where: {
         archivedAt: IsNull(),
-        categories: {
-          id: In(categories),
-        },
+        id: In(noteIds),
       },
       order: { position: 'ASC', categories: { name: 'ASC' } },
     });
-
     const archivedNotes = await this.notesRepository.find({
       relations: { categories: true },
       where: {
         archivedAt: Not(IsNull()),
-        categories: {
-          id: In(categories),
-        },
+        id: In(noteIds),
       },
       order: { archivedAt: 'DESC', categories: { name: 'ASC' } },
     });
