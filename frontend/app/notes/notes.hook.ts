@@ -4,6 +4,7 @@ import {
   createNote,
   deleteNote,
   getArchivedNotes,
+  getFavoriteNotes,
   getNote,
   getNotes,
   getNotesByCategories,
@@ -26,6 +27,13 @@ export const useGetArchivedNotes = () => {
   return useQuery({
     queryKey: [NOTES_KEY, { archived: true }],
     queryFn: getArchivedNotes,
+  });
+};
+
+export const useGetFavoriteNotes = () => {
+  return useQuery({
+    queryKey: [NOTES_KEY, { favorites: true }],
+    queryFn: getFavoriteNotes,
   });
 };
 
@@ -73,6 +81,9 @@ export const useUpdateNote = () => {
       queryClient.invalidateQueries({ queryKey: [NOTES_KEY] });
       queryClient.invalidateQueries({
         queryKey: [NOTES_KEY, { archived: true }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [NOTES_KEY, { favorites: true }],
       });
     },
     onError: (error) => {

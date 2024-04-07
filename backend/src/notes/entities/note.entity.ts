@@ -21,6 +21,9 @@ export class Note {
   @Column({ type: 'mediumtext' })
   content: string;
 
+  @Column({ default: false })
+  favorite: boolean;
+
   @Column()
   position: number;
 

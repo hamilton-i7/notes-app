@@ -77,6 +77,28 @@ export class NotesService {
     return { active: activeNotes, archived: archivedNotes };
   }
 
+  async findFavorites(): Promise<{ active: Note[]; archived: Note[] }> {
+    const activeNotes = await this.notesRepository.find({
+      relations: { categories: true },
+      where: {
+        archivedAt: IsNull(),
+        favorite: true,
+      },
+      order: { position: 'ASC', categories: { name: 'ASC' } },
+    });
+
+    const archivedNotes = await this.notesRepository.find({
+      relations: { categories: true },
+      where: {
+        archivedAt: Not(IsNull()),
+        favorite: true,
+      },
+      order: { archivedAt: 'DESC', categories: { name: 'ASC' } },
+    });
+
+    return { active: activeNotes, archived: archivedNotes };
+  }
+
   findOne(id: number): Promise<Note | null> {
     return this.notesRepository.findOne({
       where: { id },

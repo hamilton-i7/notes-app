@@ -65,12 +65,6 @@ export default function CategoriesDialog({
       { id: note!.id, note: noteDto },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: [NOTES_KEY],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [NOTES_KEY, { archived: true }],
-          });
           onClose();
         },
       }

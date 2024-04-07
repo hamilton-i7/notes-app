@@ -4,6 +4,7 @@ export type Note = {
   id: number;
   title: string;
   content: string;
+  favorite: boolean;
   createdAt: string;
   lastModified: string;
   archivedAt: string | null;

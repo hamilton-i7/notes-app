@@ -14,6 +14,13 @@ export const getArchivedNotes = async () => {
   return response.data;
 };
 
+export const getFavoriteNotes = async () => {
+  const response = await axios.get<{ active: Note[]; archived: Note[] }>(
+    '/notes/favorites'
+  );
+  return response.data;
+};
+
 export const getNotesByCategories = async (category: number) => {
   const response = await axios.get<{ active: Note[]; archived: Note[] }>(
     `/notes?categories=${category}`

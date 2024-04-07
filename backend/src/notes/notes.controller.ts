@@ -44,6 +44,11 @@ export class NotesController {
     return this.notesService.findArchived();
   }
 
+  @Get('/favorites')
+  findFavorites(): Promise<{ active: Note[]; archived: Note[] }> {
+    return this.notesService.findFavorites();
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Note> {
     const note = await this.notesService.findOne(id);

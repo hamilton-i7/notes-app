@@ -13,8 +13,9 @@ import Typography from '@mui/material/Typography';
 import { Button, Stack, useMediaQuery, useTheme } from '@mui/material';
 import {
   Add,
-  Archive,
-  Home,
+  ArchiveOutlined,
+  FavoriteBorderOutlined,
+  HomeOutlined,
   LabelOutlined,
   MoreVert,
   TipsAndUpdates,
@@ -52,9 +53,17 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
   const { data: categories, isPending, isError, error } = useGetCategories();
 
   const mainDestinations: Destination[] = [
-    { icon: <Home />, text: 'Home', href: '/notes', path: '/notes' },
+    { icon: <HomeOutlined />, text: 'Home', href: '/notes', path: '/notes' },
     {
-      icon: <Archive />,
+      icon: <FavoriteBorderOutlined />,
+      text: 'Favorites',
+      href: '/notes/favorites',
+      path: '/notes/favorites',
+    },
+  ];
+  const otherDestinations: Destination[] = [
+    {
+      icon: <ArchiveOutlined />,
       text: 'Archive',
       href: '/notes/archive',
       path: '/notes/archive',
@@ -131,6 +140,9 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       case '/notes':
         setCurrentPageTitle('Home');
         break;
+      case '/notes/favorites':
+        setCurrentPageTitle('Favorites');
+        break;
       case '/notes/archive':
         setCurrentPageTitle('Archive');
     }
@@ -193,7 +205,10 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       <Typography
         variant="body-m"
         component="h4"
-        sx={{ m: (theme) => theme.spacing(4, 4, 0) }}
+        sx={{
+          m: (theme) => theme.spacing(4, 4, 0),
+          color: (theme) => theme.palette.background.onSurfaceVariant,
+        }}
       >
         Categories
       </Typography>
@@ -226,6 +241,17 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
       >
         Create new category
       </Button>
+      <Divider />
+      <List>
+        {otherDestinations.map((destination, index) => (
+          <DrawerItem
+            key={index}
+            destination={destination}
+            selected={currentURL === destination.path}
+            onClick={handleDrawerClose}
+          />
+        ))}
+      </List>
     </aside>
   );
 
@@ -321,6 +347,7 @@ export default function NotesDrawer({ children }: NotesDrawerProps) {
               '& .MuiDrawer-paper': {
                 boxSizing: 'border-box',
                 width: drawerWidth,
+                color: (theme) => theme.palette.outline,
               },
             }}
             open

@@ -1,3 +1,5 @@
 import { CreateNoteDto } from './create-note.dto';
 
-export type UpdateNoteDto = Partial<CreateNoteDto>;
+export type UpdateNoteDto = Partial<CreateNoteDto> & {
+  favorite?: boolean;
+};

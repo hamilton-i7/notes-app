@@ -12,9 +12,16 @@ import {
   Stack,
   Snackbar,
   Box,
+  Tooltip,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { Close, MoreVert } from '@mui/icons-material';
+import {
+  Close,
+  DoneOutlined,
+  FavoriteBorderOutlined,
+  FavoriteOutlined,
+  MoreVert,
+} from '@mui/icons-material';
 import ElevationScrollAppBar from '@/app/components/ElevationScrollAppBar';
 import BackgroundColorScrollToolbar from '@/app/components/BackgroundColorScrollToolbar';
 import NoteContent from './components/NoteContent';
@@ -22,15 +29,13 @@ import NoteMenu from './components/NoteMenu';
 import DeleteNoteDialog from './components/DeleteNoteDialog';
 import { useGetNote, useUpdateNote } from '../notes.hook';
 import { UpdateNoteDto } from '../dto/update-note.dto';
-import { useQueryClient } from '@tanstack/react-query';
-import { NOTES_KEY } from '@/app/lib/constants';
 import CategoriesDialog from '@/app/categories/components/CategoriesDialog';
 import EmptyState from './components/EmptyState';
 import NoteContentSkeleton from './components/NoteContentSkeleton';
 import { Category } from '@/app/categories/models/category.model';
 import { useGetCategories } from '@/app/categories/categories.hook';
 
-const SNACKBAR_DURATION = 3_000;
+const SNACKBAR_DURATION_MILLIS = 3_000;
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -59,9 +64,6 @@ function PermanentContentWrapper({ children }: { children: React.ReactNode }) {
 
 export default function NotePage() {
   const { currentNoteId, setCurrentNoteId } = useContext(NotesContext);
-
-  const queryClient = useQueryClient();
-
   const {
     data: note,
     isPending,
@@ -127,12 +129,26 @@ export default function NotePage() {
       { id: note!.id, note: noteDto },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: note!.archivedAt
-              ? [NOTES_KEY, { archived: true }]
-              : [NOTES_KEY],
-          });
           setSnackbarMessage('Note updated 😊');
+          setUseSnackbarAction(false);
+          setShowSnackbar(true);
+        },
+      }
+    );
+  };
+
+  const handleFavoriteToggle = () => {
+    const favorite = !note!.favorite;
+    const message = favorite
+      ? 'Added to favorites 💖'
+      : 'Removed from favorites 💔';
+    const noteDto: UpdateNoteDto = { favorite };
+
+    updateNote(
+      { id: note!.id, note: noteDto },
+      {
+        onSuccess: () => {
+          setSnackbarMessage(message);
           setUseSnackbarAction(false);
           setShowSnackbar(true);
         },
@@ -146,21 +162,14 @@ export default function NotePage() {
     const archivedAt = note!.archivedAt
       ? null
       : new Date(Date.now()).toISOString();
+    const message = archivedAt ? 'Note archived 😟' : 'Note restored 😃';
     const noteDto: UpdateNoteDto = { archivedAt };
 
     updateNote(
       { id: note!.id, note: noteDto },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: [NOTES_KEY],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [NOTES_KEY, { archived: true }],
-          });
-          setSnackbarMessage(
-            archivedAt ? 'Note archived 😟' : 'Note restored 😃'
-          );
+          setSnackbarMessage(message);
           setUseSnackbarAction(true);
           setShowSnackbar(true);
         },
@@ -186,19 +195,7 @@ export default function NotePage() {
       : new Date(Date.now()).toISOString();
     const noteDto: UpdateNoteDto = { archivedAt };
 
-    updateNote(
-      { id: note!.id, note: noteDto },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: [NOTES_KEY],
-          });
-          queryClient.invalidateQueries({
-            queryKey: [NOTES_KEY, { archived: true }],
-          });
-        },
-      }
-    );
+    updateNote({ id: note!.id, note: noteDto });
   };
 
   const topBar = (
@@ -220,20 +217,45 @@ export default function NotePage() {
             >
               <Close />
             </IconButton>
-            <Stack direction="row" alignItems="center">
-              <Button
-                variant="text"
-                onClick={handleUpdateNote}
-                sx={{ typography: 'body-l', textTransform: 'capitalize' }}
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={4}
+              sx={{ color: (theme) => theme.palette.background.onSurface }}
+            >
+              <Tooltip title="Save">
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={handleUpdateNote}
+                  aria-label="save"
+                >
+                  <DoneOutlined />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip
+                title={note?.favorite ? 'Unfavorite note' : 'Favorite note'}
               >
-                Save
-              </Button>
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={handleFavoriteToggle}
+                  aria-label="Toggle favorite"
+                >
+                  {note?.favorite ? (
+                    <FavoriteOutlined />
+                  ) : (
+                    <FavoriteBorderOutlined />
+                  )}
+                </IconButton>
+              </Tooltip>
+
               <IconButton
                 edge="end"
                 color="inherit"
                 onClick={handleOptionsClick}
-                aria-label="close"
-                sx={{ mx: (theme) => theme.spacing(2) }}
+                aria-label="more options"
               >
                 <MoreVert />
               </IconButton>
@@ -344,7 +366,7 @@ export default function NotePage() {
       <Snackbar
         open={showSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        autoHideDuration={SNACKBAR_DURATION}
+        autoHideDuration={SNACKBAR_DURATION_MILLIS}
         onClose={handleCloseSnakbar}
         message={snackbarMessage}
         action={useSnackbarAction ? snackbarAction : null}
