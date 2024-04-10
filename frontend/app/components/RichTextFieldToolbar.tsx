@@ -55,6 +55,13 @@ const ToolbarIconButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
+const ToolbarToggleButton = styled(ToggleButton)(({ theme }) => ({
+  '&.MuiButtonBase-root': {
+    borderRadius: theme.spacing(1),
+    border: 0,
+  },
+}));
+
 export default function RichTextFieldToolbar({
   editor,
 }: RichTextFieldToolbarProps) {
@@ -217,6 +224,14 @@ export default function RichTextFieldToolbar({
 
   const handleAlignmentClick = (alignment: Alignment) => {
     setAlignment(alignment);
+  };
+
+  const handleBulletListToggle = () => {
+    editor!.chain().focus().toggleBulletList().run();
+  };
+
+  const handleNumberedListToggle = () => {
+    editor!.chain().focus().toggleOrderedList().run();
   };
 
   useEffect(() => {
@@ -404,14 +419,24 @@ export default function RichTextFieldToolbar({
       />
 
       <Tooltip arrow title="Bullet list (Ctrl+Shift+8)">
-        <ToolbarIconButton>
+        <ToolbarToggleButton
+          value="Bullet list"
+          onClick={handleBulletListToggle}
+          selected={editor.isActive('bulletList')}
+          color="primary"
+        >
           <FormatListBulletedOutlined />
-        </ToolbarIconButton>
+        </ToolbarToggleButton>
       </Tooltip>
       <Tooltip arrow title="Numbered list (Ctrl+Shift+7)">
-        <ToolbarIconButton>
+        <ToolbarToggleButton
+          value="Numbered list"
+          onClick={handleNumberedListToggle}
+          selected={editor.isActive('orderedList')}
+          color="primary"
+        >
           <FormatListNumberedOutlined />
-        </ToolbarIconButton>
+        </ToolbarToggleButton>
       </Tooltip>
 
       <Divider orientation="vertical" flexItem />
