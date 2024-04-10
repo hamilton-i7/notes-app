@@ -1,0 +1,8 @@
+.editor {
+  outline: none;
+  width: 100%;
+}
+
+.editor > p {
+  word-wrap: anywhere;
+}

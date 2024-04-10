@@ -3,6 +3,18 @@ import { Box, Stack, TextField } from '@mui/material';
 import DateText from '../../components/DateCreated';
 import CategoryChips from '@/app/categories/components/CategoryChips';
 import { Category } from '@/app/categories/models/category.model';
+import { EditorContent, useEditor } from '@tiptap/react';
+import RichTextFieldToolbar from '@/app/components/RichTextFieldToolbar';
+import StarterKit from '@tiptap/starter-kit';
+import { EMPTY_NOTE_CONTENT } from '@/app/lib/constants';
+import HardBreak from '@tiptap/extension-hard-break';
+import Placeholder from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
+import Underline from '@tiptap/extension-underline';
+import Link from '@tiptap/extension-link';
+import Typography from '@tiptap/extension-typography';
+import styles from '@/app/components/styles.module.css';
+import ListItem from '@tiptap/extension-list-item';
 
 type NoteContentProps = {
   title?: string;
@@ -23,6 +35,37 @@ export default function NoteContent({
   lastModified,
   categories = [],
 }: NoteContentProps) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        horizontalRule: false,
+        blockquote: false,
+        codeBlock: false,
+        heading: {
+          levels: [1, 2],
+        },
+      }),
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Link,
+      Placeholder.configure({
+        placeholder: EMPTY_NOTE_CONTENT,
+      }),
+      Typography,
+    ],
+    content,
+    editorProps: {
+      attributes: {
+        class: `${styles.editor}`,
+      },
+    },
+    onUpdate({ editor }) {
+      onContentChange(editor.getHTML());
+    },
+  });
+
   return (
     <Stack
       sx={{
@@ -42,6 +85,7 @@ export default function NoteContent({
           variant="outlined"
           fullWidth
           placeholder="Title"
+          autoFocus
           value={title}
           onChange={(event) => onTitleChange(event.target.value)}
           sx={{
@@ -54,33 +98,14 @@ export default function NoteContent({
             mb: (theme) => theme.spacing(4),
           }}
         />
-        <TextField
-          variant="outlined"
-          multiline
-          fullWidth
-          placeholder="Note"
-          value={content}
-          onChange={(event) => onContentChange(event.target.value)}
-          sx={{
-            flex: 1,
-            mb: (theme) => theme.spacing(6),
-            '& .MuiInputBase-root': {
-              p: 0,
-              height: '100%',
-              alignItems: 'start',
-            },
-            '.MuiInputBase-input': { typography: 'body-l' },
-            '& .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-          }}
-        />
+        <EditorContent editor={editor} />
         {Boolean(categories.length) && (
           <Box sx={{ mb: (theme) => theme.spacing(4) }}>
             <CategoryChips categories={categories} />
           </Box>
         )}
       </Stack>
+      <RichTextFieldToolbar editor={editor} />
       {lastModified && (
         <Box sx={{ mt: (theme) => theme.spacing(4), textAlign: 'center' }}>
           <DateText date={lastModified} prefix="Last modified on: " />

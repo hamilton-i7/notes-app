@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import Providers from './providers';
 import theme from './lib/theme';
 import NotesDrawer from './components/NotesDrawer';
+import './global.css';
 
 export const metadata: Metadata = {
   title: 'Notes App',

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { NotesContext } from './NotesContext';
-import { Note } from './models/note.model';
 import { Stack } from '@mui/material';
 
 export default function NotesLayout({

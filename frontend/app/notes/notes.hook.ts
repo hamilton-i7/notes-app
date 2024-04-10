@@ -14,6 +14,16 @@ import {
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { ReorderNotesDto } from './dto/reorder-notes.dto';
+import { Content, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import Link from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
+import { EMPTY_NOTE_CONTENT } from '@/app/lib/constants';
+import Typography from '@tiptap/extension-typography';
+import HardBreak from '@tiptap/extension-hard-break';
+import styles from '@/app/components/styles.module.css';
 
 export const useGetNotes = (enabled = true) => {
   return useQuery({

@@ -1,5 +1,4 @@
 import { createContext } from 'react';
-import { Note } from './models/note.model';
 
 type ContextProps = {
   currentNoteId: number | null;

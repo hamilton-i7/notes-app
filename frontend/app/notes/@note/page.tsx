@@ -324,8 +324,6 @@ export default function NotePage() {
     <NoteContent
       title={title}
       onTitleChange={handleTitleChange}
-      content={content}
-      onContentChange={handleContentChange}
       dateCreated={note.createdAt}
       lastModified={note.lastModified}
       categories={noteCategories}

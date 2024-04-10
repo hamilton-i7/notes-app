@@ -11,13 +11,25 @@ import {
   Slide,
   Button,
   Box,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import NoteContent from '../@note/components/NoteContent';
 import { NotesContext } from '../NotesContext';
 import { TransitionProps } from '@mui/material/transitions';
 import { useCreateNote } from '../notes.hook';
 import { CreateNoteDto } from '../dto/create-note.dto';
+import { useEditor } from '@tiptap/react';
+import { EMPTY_NOTE_CONTENT } from '@/app/lib/constants';
+import HardBreak from '@tiptap/extension-hard-break';
+import Placeholder from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
+import Underline from '@tiptap/extension-underline';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Typography from '@tiptap/extension-typography';
+import styles from '@/app/components/styles.module.css';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -32,6 +44,9 @@ export default function AddNotePage() {
   const { mutate: createNote } = useCreateNote();
   const { displayAddNote, setDisplayAddNote, setCurrentNoteId } =
     useContext(NotesContext);
+
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('lg'));
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -108,33 +123,35 @@ export default function AddNotePage() {
     </>
   );
 
-  return (
-    <>
-      <Dialog
-        fullScreen
-        open
-        onClose={handleClose}
-        TransitionComponent={Transition}
-        sx={{
-          display: { xs: 'block', lg: 'none' },
-          '& .MuiPaper-root': {
-            bgcolor: (theme) => theme.palette.background.surface,
-          },
-        }}
-      >
-        {pageContent}
-      </Dialog>
+  if (matches) {
+    return (
       <Box
         sx={{
-          display: { xs: 'none', lg: 'flex' },
-          flexDirection: { lg: 'column' },
-          flex: { lg: 1 },
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
           borderLeft: (theme) =>
             `${theme.spacing(0.25)} solid ${theme.palette.outline}`,
         }}
       >
         {pageContent}
       </Box>
-    </>
+    );
+  }
+
+  return (
+    <Dialog
+      fullScreen
+      open
+      onClose={handleClose}
+      TransitionComponent={Transition}
+      sx={{
+        '& .MuiPaper-root': {
+          bgcolor: (theme) => theme.palette.background.surface,
+        },
+      }}
+    >
+      {pageContent}
+    </Dialog>
   );
 }
