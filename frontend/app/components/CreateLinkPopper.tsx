@@ -53,7 +53,7 @@ export default function CreateLinkPopper({
           }}
         >
           <Paper
-            elevation={4}
+            elevation={2}
             sx={{
               width: '100%',
               p: (theme) => theme.spacing(4),

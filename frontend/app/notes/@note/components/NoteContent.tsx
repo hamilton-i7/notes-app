@@ -7,14 +7,12 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import RichTextFieldToolbar from '@/app/components/RichTextFieldToolbar';
 import StarterKit from '@tiptap/starter-kit';
 import { EMPTY_NOTE_CONTENT } from '@/app/lib/constants';
-import HardBreak from '@tiptap/extension-hard-break';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Typography from '@tiptap/extension-typography';
 import styles from '@/app/components/styles.module.css';
-import ListItem from '@tiptap/extension-list-item';
 
 type NoteContentProps = {
   title?: string;
@@ -49,7 +47,7 @@ export default function NoteContent({
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Link,
+      Link.extend({ inclusive: false }),
       Placeholder.configure({
         placeholder: EMPTY_NOTE_CONTENT,
       }),

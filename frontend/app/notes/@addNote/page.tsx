@@ -14,22 +14,12 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import NoteContent from '../@note/components/NoteContent';
 import { NotesContext } from '../NotesContext';
 import { TransitionProps } from '@mui/material/transitions';
 import { useCreateNote } from '../notes.hook';
 import { CreateNoteDto } from '../dto/create-note.dto';
-import { useEditor } from '@tiptap/react';
-import { EMPTY_NOTE_CONTENT } from '@/app/lib/constants';
-import HardBreak from '@tiptap/extension-hard-break';
-import Placeholder from '@tiptap/extension-placeholder';
-import TextAlign from '@tiptap/extension-text-align';
-import Underline from '@tiptap/extension-underline';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import Typography from '@tiptap/extension-typography';
-import styles from '@/app/components/styles.module.css';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {

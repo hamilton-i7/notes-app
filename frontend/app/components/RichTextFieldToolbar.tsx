@@ -1,21 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { type Editor } from '@tiptap/react';
 import {
+  ClickAwayListener,
   Divider,
   IconButton,
   Stack,
   ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
   styled,
   useMediaQuery,
   useTheme,
-  toggleButtonGroupClasses,
 } from '@mui/material';
 import {
   ArrowDropDownOutlined,
   CodeOutlined,
+  FormatAlignCenterOutlined,
+  FormatAlignJustifyOutlined,
   FormatAlignLeftOutlined,
+  FormatAlignRightOutlined,
   FormatBoldOutlined,
   FormatItalicOutlined,
   FormatListBulletedOutlined,
@@ -28,9 +30,20 @@ import {
   UndoOutlined,
 } from '@mui/icons-material';
 import HeadingsMenu from './HeadingsMenu';
-import { BOLD, ITALIC, STRIKETHROUGH, UNDERLINE } from '../lib/constants';
+import {
+  BOLD,
+  CENTER,
+  ITALIC,
+  JUSTIFY,
+  LEFT,
+  RIGHT,
+  STRIKETHROUGH,
+  UNDERLINE,
+} from '../lib/constants';
 import CreateLinkPopper from './CreateLinkPopper';
 import LinkPopper from './LinkPopper';
+import { ToggleButtonGroup } from './ToggleButtonGroup';
+import TextAlignPopper, { Alignment } from './TextAlignPopper';
 
 type RichTextFieldToolbarProps = {
   editor: Editor | null;
@@ -40,22 +53,6 @@ const ToolbarIconButton = styled(IconButton)(({ theme }) => ({
   '&.MuiButtonBase-root': {
     borderRadius: theme.spacing(1),
   },
-}));
-
-const ToolbarToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  [`& .${toggleButtonGroupClasses.grouped}`]: {
-    margin: theme.spacing(0.5),
-    border: 0,
-    borderRadius: theme.shape.borderRadius,
-    [`&.${toggleButtonGroupClasses.disabled}`]: {
-      border: 0,
-    },
-  },
-  [`& .${toggleButtonGroupClasses.middleButton},& .${toggleButtonGroupClasses.lastButton}`]:
-    {
-      marginLeft: -1,
-      borderLeft: '1px solid transparent',
-    },
 }));
 
 export default function RichTextFieldToolbar({
@@ -79,6 +76,12 @@ export default function RichTextFieldToolbar({
   const linkPopperAnchorRef = useRef<HTMLButtonElement>(null);
   const [linkText, setLinkText] = useState('');
   const [href, setHref] = useState('');
+
+  const [openTextAlignPopper, setOpenTextAlignPopper] = useState(false);
+  const textAlignPopperAnchorRef = useRef<HTMLButtonElement>(null);
+
+  const [openAlignTooltip, setOpenAlignTooltip] = useState(false);
+  const [alignment, setAlignment] = useState<Alignment>(LEFT);
 
   const handleHeadingsButtonClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -123,14 +126,27 @@ export default function RichTextFieldToolbar({
     editor!.chain().focus().toggleStrike().run();
   };
 
-  const handleLinkPopperClick = () => {
+  const handleLinkPopperToggle = () => {
     const currentHref = editor!.getAttributes('link').href;
     if (currentHref) {
       setHref(currentHref);
-      setOpenLinkPopper((prev) => !prev);
+      setOpenLinkPopper((prev) => {
+        const open = !prev;
+        if (!open) {
+          editor!.chain().focus().run();
+        }
+        return open;
+      });
       return;
     }
-    setOpenCreateLinkPopper((prev) => !prev);
+    setOpenCreateLinkPopper((prev) => {
+      const open = !prev;
+      if (!open) {
+        editor!.chain().focus().run();
+      }
+      return open;
+    });
+    setHref('');
   };
 
   const handleLinkTextChange = (text: string) => {
@@ -174,8 +190,33 @@ export default function RichTextFieldToolbar({
     }
     setOpenCreateLinkPopper(false);
     setOpenLinkPopper(false);
-    setLinkText('');
-    setHref('');
+  };
+
+  const handleAlignTooltipOpen = () => {
+    setOpenAlignTooltip(true);
+  };
+
+  const handleAlignTooltipClose = () => {
+    setOpenAlignTooltip(false);
+  };
+
+  const handleTextAlignPopperToggle = () => {
+    handleAlignTooltipClose();
+    setOpenTextAlignPopper((prev) => !prev);
+  };
+
+  const handleCloseTextAlignPopper = (event: Event | React.SyntheticEvent) => {
+    if (
+      textAlignPopperAnchorRef.current &&
+      textAlignPopperAnchorRef.current.contains(event.target as HTMLElement)
+    ) {
+      return;
+    }
+    setOpenTextAlignPopper(false);
+  };
+
+  const handleAlignmentClick = (alignment: Alignment) => {
+    setAlignment(alignment);
   };
 
   useEffect(() => {
@@ -233,7 +274,7 @@ export default function RichTextFieldToolbar({
       <Tooltip title="Styles" arrow>
         <ToolbarIconButton onClick={handleHeadingsButtonClick}>
           <FormatSizeOutlined />
-          <ArrowDropDownOutlined />
+          <ArrowDropDownOutlined fontSize="small" />
         </ToolbarIconButton>
       </Tooltip>
       <HeadingsMenu
@@ -253,7 +294,7 @@ export default function RichTextFieldToolbar({
 
       <Divider orientation="vertical" flexItem />
 
-      <ToolbarToggleButtonGroup
+      <ToggleButtonGroup
         size="small"
         color="primary"
         value={formats}
@@ -296,14 +337,14 @@ export default function RichTextFieldToolbar({
             <FormatStrikethroughOutlined />
           </ToggleButton>
         </Tooltip>
-      </ToolbarToggleButtonGroup>
+      </ToggleButtonGroup>
 
       <Divider orientation="vertical" flexItem />
 
       <Tooltip arrow title="Link">
         <ToolbarIconButton
           ref={linkPopperAnchorRef}
-          onClick={handleLinkPopperClick}
+          onClick={handleLinkPopperToggle}
         >
           <LinkOutlined />
         </ToolbarIconButton>
@@ -329,12 +370,39 @@ export default function RichTextFieldToolbar({
 
       <Divider orientation="vertical" flexItem />
 
-      <Tooltip arrow title="Align">
-        <ToolbarIconButton>
-          <FormatAlignLeftOutlined />
-          <ArrowDropDownOutlined />
-        </ToolbarIconButton>
-      </Tooltip>
+      <ClickAwayListener onClickAway={handleAlignTooltipClose}>
+        <Tooltip
+          arrow
+          title="Align"
+          open={openAlignTooltip}
+          onClose={handleAlignTooltipClose}
+          disableFocusListener
+          disableHoverListener
+          disableTouchListener
+          onMouseEnter={handleAlignTooltipOpen}
+          onMouseLeave={handleAlignTooltipClose}
+        >
+          <ToolbarIconButton
+            ref={textAlignPopperAnchorRef}
+            onClick={handleTextAlignPopperToggle}
+            sx={{ pr: 0 }}
+          >
+            {alignment === LEFT && <FormatAlignLeftOutlined />}
+            {alignment === CENTER && <FormatAlignCenterOutlined />}
+            {alignment === RIGHT && <FormatAlignRightOutlined />}
+            {alignment === JUSTIFY && <FormatAlignJustifyOutlined />}
+            <ArrowDropDownOutlined fontSize="small" />
+          </ToolbarIconButton>
+        </Tooltip>
+      </ClickAwayListener>
+      <TextAlignPopper
+        open={openTextAlignPopper}
+        anchorEl={textAlignPopperAnchorRef.current}
+        editor={editor}
+        onClose={handleCloseTextAlignPopper}
+        onAlignmentClick={handleAlignmentClick}
+      />
+
       <Tooltip arrow title="Bullet list (Ctrl+Shift+8)">
         <ToolbarIconButton>
           <FormatListBulletedOutlined />
